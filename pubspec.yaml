@@ -1,0 +1,7 @@
+name: hospital_management
+description: Hospital Management System
+dependencies:
+  flutter:
+    sdk: flutter
+dev_dependencies:
+  test: ^1.16.0
