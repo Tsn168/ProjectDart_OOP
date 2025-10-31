@@ -1,30 +1,47 @@
-import 'medicine.dart';
-import 'prescription.dart';
-import 'patient.dart';
+import 'person.dart';
 
-class Staff {
-  String staffId;
-  String name;
-  String role; // Doctor
-  String specialization;
-  String contact;
+class Staff extends Person {
+  final String specialization;
+  final bool isAvailable;
+  final double salary;
 
   Staff({
-    required this.staffId,
-    required this.name,
-    required this.role,
+    required String id,
+    required String name,
+    required int age,
+    required String email,
+    required String phoneNumber,
+    required String address,
     required this.specialization,
-    required this.contact,
-  });
+    this.isAvailable = true,
+    required this.salary,
+  }) : super(
+         id: id,
+         name: name,
+         age: age,
+         email: email,
+         phoneNumber: phoneNumber,
+         address: address,
+       );
 
-  Prescription createPrescription(Patient patient, List<Medicine> medicines) {
-    Prescription presc = Prescription(
-      prescriptionId: DateTime.now().millisecondsSinceEpoch.toString(),
-      doctor: this,
-      patient: patient,
-      medicines: medicines,
-      date: DateTime.now(),
+  @override
+  String getRole() => 'Staff';
+
+  Staff copyWith({bool? isAvailable}) {
+    return Staff(
+      id: id,
+      name: name,
+      age: age,
+      email: email,
+      phoneNumber: phoneNumber,
+      address: address,
+      specialization: specialization,
+      isAvailable: isAvailable ?? this.isAvailable,
+      salary: salary,
     );
-    return presc;
   }
+
+  @override
+  String toString() =>
+      'Staff(id: $id, name: $name, specialization: $specialization, isAvailable: $isAvailable)';
 }

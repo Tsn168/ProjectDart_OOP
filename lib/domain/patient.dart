@@ -1,20 +1,54 @@
-import 'prescription.dart';
+import 'person.dart';
 
-class Patient {
-  String patientId;
-  String name;
-  int age;
-  String gender;
-  String sicknessType;
-  DateTime enterDate;
-  List<Prescription> prescriptions = [];
+class Patient extends Person {
+  final String medicalHistory;
+  final String? assignedRoomId;
+  final List<String> allergies;
+  final String bloodType;
 
   Patient({
-    required this.patientId,
-    required this.name,
-    required this.age,
-    required this.gender,
-    required this.sicknessType,
-    required this.enterDate,
-  });
+    required String id,
+    required String name,
+    required int age,
+    required String email,
+    required String phoneNumber,
+    required String address,
+    required this.medicalHistory,
+    this.assignedRoomId,
+    required this.allergies,
+    required this.bloodType,
+  }) : super(
+         id: id,
+         name: name,
+         age: age,
+         email: email,
+         phoneNumber: phoneNumber,
+         address: address,
+       );
+
+  @override
+  String getRole() => 'Patient';
+
+  Patient copyWith({
+    String? assignedRoomId,
+    String? medicalHistory,
+    List<String>? allergies,
+  }) {
+    return Patient(
+      id: id,
+      name: name,
+      age: age,
+      email: email,
+      phoneNumber: phoneNumber,
+      address: address,
+      medicalHistory: medicalHistory ?? this.medicalHistory,
+      assignedRoomId: assignedRoomId ?? this.assignedRoomId,
+      allergies: allergies ?? this.allergies,
+      bloodType: bloodType,
+    );
+  }
+
+  @override
+  String toString() =>
+      'Patient(id: $id, name: $name, age: $age, bloodType: $bloodType, assignedRoomId: $assignedRoomId)';
 }
