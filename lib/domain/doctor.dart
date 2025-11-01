@@ -1,6 +1,7 @@
-import 'staff.dart';
+import 'person.dart';
 
-class Doctor extends Staff {
+class Doctor extends Person {
+  final String specialization;
   final String licenseNumber;
   final List<String> certifications;
   final int yearsOfExperience;
@@ -13,24 +14,19 @@ class Doctor extends Staff {
     required String email,
     required String phoneNumber,
     required String address,
-    required String specialization,
-    required bool isAvailable,
-    required double salary,
+    required this.specialization,
     required this.licenseNumber,
     required this.certifications,
     required this.yearsOfExperience,
     required this.department,
   }) : super(
-         id: id,
-         name: name,
-         age: age,
-         email: email,
-         phoneNumber: phoneNumber,
-         address: address,
-         specialization: specialization,
-         isAvailable: isAvailable,
-         salary: salary,
-       );
+        id: id,
+        name: name,
+        age: age,
+        email: email,
+        phoneNumber: phoneNumber,
+        address: address,
+      );
 
   @override
   String getRole() => 'Doctor';
@@ -46,7 +42,6 @@ class Doctor extends Staff {
   }
 
   Doctor copyWith({
-    bool? isAvailable,
     String? department,
     int? yearsOfExperience,
   }) {
@@ -58,8 +53,6 @@ class Doctor extends Staff {
       phoneNumber: phoneNumber,
       address: address,
       specialization: specialization,
-      isAvailable: isAvailable ?? this.isAvailable,
-      salary: salary,
       licenseNumber: licenseNumber,
       certifications: certifications,
       yearsOfExperience: yearsOfExperience ?? this.yearsOfExperience,
@@ -69,5 +62,5 @@ class Doctor extends Staff {
 
   @override
   String toString() =>
-      'Doctor(id: $id, name: $name, specialization: $specialization, department: $department, isAvailable: $isAvailable, isQualified: ${isQualified()})';
+      'Doctor(id: $id, name: $name, specialization: $specialization, department: $department, experience: $yearsOfExperience years, qualified: ${isQualified()})';
 }

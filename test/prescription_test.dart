@@ -1,9 +1,7 @@
-import '../lib/domain/prescription.dart';
 import '../lib/domain/doctor.dart';
 import '../lib/domain/patient.dart';
 import '../lib/domain/tablet.dart';
 import '../lib/domain/injection.dart';
-import '../lib/domain/syrup.dart';
 import '../lib/domain/prescription_service.dart';
 import '../lib/data/prescription_repo.dart';
 
@@ -19,8 +17,6 @@ void main() {
     phoneNumber: '+966501234567',
     address: 'Riyadh',
     specialization: 'Cardiology',
-    isAvailable: true,
-    salary: 15000.0,
     licenseNumber: 'LIC001',
     certifications: ['Board Certified'],
     yearsOfExperience: 10,
@@ -47,6 +43,8 @@ void main() {
       quantity: 30,
       manufacturer: 'Bayer',
       expiryDate: DateTime.now().add(Duration(days: 365)),
+      frequency: 'Twice daily',
+      instructions: 'Take with food',
       shape: 'Round',
       color: 'White',
       coated: true,
@@ -58,6 +56,8 @@ void main() {
       quantity: 10,
       manufacturer: 'Novo Nordisk',
       expiryDate: DateTime.now().add(Duration(days: 180)),
+      frequency: 'Once daily',
+      instructions: 'Inject before breakfast',
       injectionType: 'Subcutaneous',
       route: 'SC',
       volumeMl: 1.0,
@@ -78,11 +78,16 @@ void main() {
       notes: 'Take twice daily after meals',
       validityDays: 30,
     );
-    prescriptionRepository.addPrescription(prescription);
-    print('   ✓ Prescription created: ${prescription.prescriptionId}');
-    print('   ✓ Doctor: ${prescription.doctor.name}');
-    print('   ✓ Patient: ${prescription.patient.name}');
-    print('   ✓ Medicines: ${prescription.medicines.length}');
+    
+    if (prescription != null) {
+      prescriptionRepository.addPrescription(prescription);
+      print('   ✓ Prescription created: ${prescription.prescriptionId}');
+      print('   ✓ Doctor: ${prescription.doctor.name}');
+      print('   ✓ Patient: ${prescription.patient.name}');
+      print('   ✓ Medicines: ${prescription.medicines.length}');
+    } else {
+      print('   ⚠️  Prescription creation cancelled (likely due to allergies)');
+    }
   } catch (e) {
     print('   ✗ Error: $e');
   }
@@ -143,8 +148,13 @@ void main() {
     notes: 'For pain relief',
     validityDays: 14,
   );
-  prescriptionRepository.addPrescription(prescription2);
-  print('   ✓ Second prescription created: ${prescription2.prescriptionId}');
+  
+  if (prescription2 != null) {
+    prescriptionRepository.addPrescription(prescription2);
+    print('   ✓ Second prescription created: ${prescription2.prescriptionId}');
+  } else {
+    print('   ⚠️  Second prescription cancelled');
+  }
 
   // Test 9: Update Prescription Status
   print('\n✓ Test 9: Updating prescription status...');

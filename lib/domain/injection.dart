@@ -12,6 +12,8 @@ class Injection extends Medicine {
     required int quantity,
     required String manufacturer,
     required DateTime expiryDate,
+    required String frequency,
+    required String instructions,
     required this.injectionType,
     required this.route,
     required this.volumeMl,
@@ -22,6 +24,8 @@ class Injection extends Medicine {
          quantity: quantity,
          manufacturer: manufacturer,
          expiryDate: expiryDate,
+         frequency: frequency,
+         instructions: instructions,
        );
 
   @override

@@ -5,6 +5,8 @@ abstract class Medicine {
   final int quantity;
   final String manufacturer;
   final DateTime expiryDate;
+  final String frequency;
+  final String instructions;
 
   Medicine({
     required this.id,
@@ -13,6 +15,8 @@ abstract class Medicine {
     required this.quantity,
     required this.manufacturer,
     required this.expiryDate,
+    required this.frequency,
+    required this.instructions,
   });
 
   // Abstract method to be implemented by subclasses

@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import '../domain/prescription.dart';
-import '../domain/doctor.dart';
-import '../domain/patient.dart';
 
 class PrescriptionRepository {
   List<Prescription> _prescriptions = [];
@@ -117,7 +115,7 @@ class PrescriptionRepository {
     return _prescriptions.where((p) => p.status == status).toList();
   }
 
-  // Save to JSON file
+  // Save to JSON file with error handling
   void _saveToJson() {
     try {
       final file = File(_filePath);
@@ -126,11 +124,35 @@ class PrescriptionRepository {
       file.writeAsStringSync(jsonString);
       print('✓ Prescriptions saved to JSON');
     } catch (e) {
-      print('✗ Error saving prescriptions to JSON: $e');
+      print('╔════════════════════════════════════════════════════╗');
+      print('║  ❌ ERROR: FAILED TO SAVE DATA                     ║');
+      print('╚════════════════════════════════════════════════════╝');
+      print('Error details: $e');
+      print('');
+      print('Actions taken:');
+      print('✅ Data retained in memory');
+      print('⚠️  Creating backup...');
+      
+      try {
+        // Create backup file
+        final backupFile = File('prescriptions_backup_${DateTime.now().millisecondsSinceEpoch}.json');
+        final jsonList = _prescriptions.map((p) => p.toMap()).toList();
+        final jsonString = jsonEncode(jsonList);
+        backupFile.writeAsStringSync(jsonString);
+        print('✅ Backup created: ${backupFile.path}');
+      } catch (backupError) {
+        print('❌ Backup also failed: $backupError');
+      }
+      
+      print('');
+      print('Please check:');
+      print('• Disk space available');
+      print('• File permissions');
+      print('• Contact system administrator if problem persists');
     }
   }
 
-  // Load from JSON file
+  // Load from JSON file with error handling
   void _loadFromJson() {
     try {
       final file = File(_filePath);
@@ -142,8 +164,38 @@ class PrescriptionRepository {
         print('ℹ No existing JSON file found. Starting with empty repository.');
       }
     } catch (e) {
-      print('✗ Error loading prescriptions from JSON: $e');
+      print('╔════════════════════════════════════════════════════╗');
+      print('║  ⚠️  WARNING: FAILED TO LOAD DATA                  ║');
+      print('╚════════════════════════════════════════════════════╝');
+      print('Error details: $e');
+      print('');
+      print('Starting with empty repository.');
+      print('If you had previous data, check for backup files.');
+      _prescriptions = [];
     }
+  }
+
+  // Generate unique prescription ID
+  String generateUniquePrescriptionId() {
+    String id;
+    int attempts = 0;
+    const maxAttempts = 100;
+    
+    do {
+      // Generate ID based on timestamp and random component
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final random = (timestamp % 10000).toString().padLeft(4, '0');
+      id = 'RX$random';
+      
+      attempts++;
+      if (attempts >= maxAttempts) {
+        // Fallback to guaranteed unique ID using timestamp
+        id = 'RX${DateTime.now().millisecondsSinceEpoch}';
+        break;
+      }
+    } while (getPrescriptionById(id) != null);
+    
+    return id;
   }
 
   // Export all prescriptions as JSON string

@@ -12,17 +12,21 @@ class Tablet extends Medicine {
     required int quantity,
     required String manufacturer,
     required DateTime expiryDate,
+    required String frequency,
+    required String instructions,
     required this.shape,
     required this.color,
     this.coated = false,
   }) : super(
-         id: id,
-         name: name,
-         dosage: dosage,
-         quantity: quantity,
-         manufacturer: manufacturer,
-         expiryDate: expiryDate,
-       );
+        id: id,
+        name: name,
+        dosage: dosage,
+        quantity: quantity,
+        manufacturer: manufacturer,
+        expiryDate: expiryDate,
+        frequency: frequency,
+        instructions: instructions,
+      );
 
   @override
   String getMedicineType() => 'Tablet';

@@ -4,6 +4,7 @@ import '../domain/patient.dart';
 import '../domain/medicine.dart';
 import '../domain/prescription_service.dart';
 import '../data/prescription_repo.dart';
+import '../utils/input_validator.dart';
 
 class PrescriptionConsole {
   final PrescriptionRepository prescriptionRepository;
@@ -21,22 +22,28 @@ class PrescriptionConsole {
   );
 // Ai generating
   void displayMainMenu() {
-    print('\n╔════════════════════════════════════════════╗');
-    print('║  Prescription Management System - Main Menu║');
-    print('╠════════════════════════════════════════════╣');
-    print('║  1. Create Prescription                    ║');
-    print('║  2. View All Prescriptions                 ║');
-    print('║  3. View Patient Prescriptions             ║');
-    print('║  4. Validate Prescription                  ║');
-    print('║  5. View Statistics                        ║');
-    print('║  6. Export Data                            ║');
-    print('║  7. Exit                                   ║');
-    print('╚════════════════════════════════════════════╝');
-    print('Enter your choice: ');
+    print('\n╔════════════════════════════════════════════════════╗');
+    print('║   Hospital Prescription Management System v2.0    ║');
+    print('║   🏥 Safe • Reliable • Patient-Centered          ║');
+    print('╚════════════════════════════════════════════════════╝');
+    print('');
+    print('┌─────────────────────────────────────────────────┐');
+    print('│  PRESCRIPTION MANAGEMENT                        │');
+    print('├─────────────────────────────────────────────────┤');
+    print('│  1. 📝 Create New Prescription                  │');
+    print('│  2. 📋 View All Prescriptions                   │');
+    print('│  3. 👤 View Patient Prescriptions               │');
+    print('│  4. ✅ Validate Prescription                     │');
+    print('│  5. 📊 View Statistics                          │');
+    print('│  6. 💾 Export Data                              │');
+    print('│  0. 🚪 Exit                                      │');
+    print('└─────────────────────────────────────────────────┘');
   }
 
   void createPrescription() {
-    print('\n--- Create New Prescription ---');
+    print('\n╔════════════════════════════════════════════════════╗');
+    print('║  📝 CREATE NEW PRESCRIPTION                        ║');
+    print('╚════════════════════════════════════════════════════╝');
 
     if (doctors.isEmpty) {
       print('✗ No doctors available. Please add a doctor first.');
@@ -51,62 +58,122 @@ class PrescriptionConsole {
       return;
     }
 
-    print('Enter Prescription ID: ');
-    final prescriptionId = stdin.readLineSync() ?? '';
+    // Generate unique prescription ID
+    final prescriptionId = prescriptionRepository.generateUniquePrescriptionId();
+    print('Generated Prescription ID: $prescriptionId');
 
+    print('\n┌─────────────────────────────────────────────────┐');
+    print('│  STEP 1: SELECT DOCTOR                          │');
+    print('└─────────────────────────────────────────────────┘');
     print('\nAvailable Doctors:');
     for (var i = 0; i < doctors.length; i++) {
-      print('${i + 1}. ${doctors[i].name} (${doctors[i].specialization})');
+      final doc = doctors[i];
+      print('  ${i + 1}. ${doc.name} (${doc.specialization})');
+      print('     Experience: ${doc.yearsOfExperience} years');
+      print('     Qualified: ${doc.isQualified() ? "✅ Yes" : "❌ No"}');
     }
-    print('Select Doctor (number): ');
-    final doctorIdx = (int.tryParse(stdin.readLineSync() ?? '') ?? 1) - 1;
-    if (doctorIdx < 0 || doctorIdx >= doctors.length) {
-      print('✗ Invalid doctor selection.');
-      return;
-    }
+    
+    final doctorIdx = InputValidator.readIntInRange(
+      '\nSelect Doctor (1-${doctors.length}): ',
+      1,
+      doctors.length,
+    ) - 1;
     final doctor = doctors[doctorIdx];
+    print('✅ Selected: ${doctor.name}');
 
+    print('\n┌─────────────────────────────────────────────────┐');
+    print('│  STEP 2: SELECT PATIENT                         │');
+    print('└─────────────────────────────────────────────────┘');
     print('\nAvailable Patients:');
     for (var i = 0; i < patients.length; i++) {
-      print('${i + 1}. ${patients[i].name} (Age: ${patients[i].age})');
+      final pat = patients[i];
+      print('  ${i + 1}. ${pat.name} (Age: ${pat.age}, Blood: ${pat.bloodType})');
+      if (pat.allergies.isNotEmpty) {
+        print('     ⚠️  Allergies: ${pat.allergies.join(", ")}');
+      }
+      if (pat.medicalHistory.isNotEmpty) {
+        print('     📋 History: ${pat.medicalHistory}');
+      }
     }
-    print('Select Patient (number): ');
-    final patientIdx = (int.tryParse(stdin.readLineSync() ?? '') ?? 1) - 1;
-    if (patientIdx < 0 || patientIdx >= patients.length) {
-      print('✗ Invalid patient selection.');
-      return;
-    }
+    
+    final patientIdx = InputValidator.readIntInRange(
+      '\nSelect Patient (1-${patients.length}): ',
+      1,
+      patients.length,
+    ) - 1;
     final patient = patients[patientIdx];
+    print('✅ Selected: ${patient.name}');
 
-    print('\nAvailable Medicines:');
-    for (var i = 0; i < medicines.length; i++) {
-      print(
-        '${i + 1}. ${medicines[i].name} (${medicines[i].getMedicineType()})',
-      );
-    }
-    print('Enter Medicine indices to prescribe (comma-separated): ');
-    final medIndicesStr = stdin.readLineSync() ?? '';
-    final medIndices = medIndicesStr
-        .split(',')
-        .map((e) => (int.tryParse(e.trim()) ?? 1) - 1)
-        .toList();
-
+    print('\n┌─────────────────────────────────────────────────┐');
+    print('│  STEP 3: SELECT MEDICINES                       │');
+    print('└─────────────────────────────────────────────────┘');
+    
     final selectedMedicines = <Medicine>[];
-    for (var idx in medIndices) {
-      if (idx >= 0 && idx < medicines.length) {
-        selectedMedicines.add(medicines[idx]);
+    while (true) {
+      print('\nAvailable Medicines:');
+      for (var i = 0; i < medicines.length; i++) {
+        final med = medicines[i];
+        print('  ${i + 1}. ${med.name} (${med.getMedicineType()})');
+        print('     💊 Dosage: ${med.dosage}');
+        print('     ⏰ Frequency: ${med.frequency}');
+        print('     📅 Expires: ${med.expiryDate.toString().split(' ')[0]}');
+        if (med.isExpired()) {
+          print('     ❌ EXPIRED!');
+        }
+      }
+      
+      print('\nCurrently selected: ${selectedMedicines.length} medicine(s)');
+      if (selectedMedicines.isNotEmpty) {
+        for (var med in selectedMedicines) {
+          print('  • ${med.name}');
+        }
+      }
+      
+      print('\nEnter medicine number (1-${medicines.length}, or 0 to finish): ');
+      final choice = InputValidator.readIntInRange('Choice: ', 0, medicines.length);
+      
+      if (choice == 0) {
+        if (selectedMedicines.isEmpty) {
+          print('❌ You must select at least one medicine!');
+          continue;
+        }
+        break;
+      }
+      
+      final selectedMed = medicines[choice - 1];
+      if (selectedMedicines.contains(selectedMed)) {
+        print('⚠️  This medicine is already selected!');
+      } else {
+        selectedMedicines.add(selectedMed);
+        print('✅ Added: ${selectedMed.name}');
       }
     }
 
-    if (selectedMedicines.isEmpty) {
-      print('✗ No valid medicines selected.');
+    print('\n┌─────────────────────────────────────────────────┐');
+    print('│  STEP 4: PRESCRIPTION DETAILS                   │');
+    print('└─────────────────────────────────────────────────┘');
+    
+    final notes = InputValidator.readOptionalString('\nEnter Notes/Instructions (optional): ');
+    final validityDays = InputValidator.readPositiveInt(
+      'Enter Validity (days, default 30): ',
+      min: 1,
+      max: 365,
+    );
+
+    print('\n┌─────────────────────────────────────────────────┐');
+    print('│  STEP 5: REVIEW & CONFIRM                       │');
+    print('└─────────────────────────────────────────────────┘');
+    print('\nPrescription Summary:');
+    print('  ID: $prescriptionId');
+    print('  Doctor: ${doctor.name}');
+    print('  Patient: ${patient.name}');
+    print('  Medicines: ${selectedMedicines.length}');
+    print('  Validity: $validityDays days');
+    
+    if (!InputValidator.readConfirmation('\nCreate this prescription?')) {
+      print('❌ Prescription cancelled.');
       return;
     }
-
-    print('Enter Notes/Instructions: ');
-    final notes = stdin.readLineSync() ?? '';
-    print('Enter Validity (days): ');
-    final validityDays = int.tryParse(stdin.readLineSync() ?? '') ?? 30;
 
     try {
       final prescription = prescriptionService.createPrescription(
@@ -118,25 +185,56 @@ class PrescriptionConsole {
         validityDays: validityDays,
       );
 
-      prescriptionRepository.addPrescription(prescription);
-      print('✓ Prescription created successfully!');
-      print('${prescription.getPrescriptionInfo()}');
+      if (prescription != null) {
+        prescriptionRepository.addPrescription(prescription);
+        print('\n✅ PRESCRIPTION CREATED SUCCESSFULLY!');
+        print('${prescription.getPrescriptionInfo()}');
+      } else {
+        print('\n❌ Prescription creation cancelled due to safety concerns.');
+      }
     } catch (e) {
-      print('✗ Error creating prescription: $e');
+      print('\n❌ Error creating prescription: $e');
     }
   }
 
   void viewAllPrescriptions() {
-    print('\n--- All Prescriptions ---');
+    print('\n╔════════════════════════════════════════════════════╗');
+    print('║  📋 ALL PRESCRIPTIONS                              ║');
+    print('╚════════════════════════════════════════════════════╝');
+    
     final prescriptions = prescriptionRepository.getAllPrescriptions();
     if (prescriptions.isEmpty) {
-      print('No prescriptions found.');
+      print('\nNo prescriptions found.');
       return;
     }
-    for (var prescription in prescriptions) {
-      print(
-        '${prescription.prescriptionId} | ${prescription.doctor.name} → ${prescription.patient.name} | Medicines: ${prescription.medicines.length} | Status: ${prescription.status}',
-      );
+    
+    print('\nTotal: ${prescriptions.length} prescription(s)\n');
+    
+    for (var i = 0; i < prescriptions.length; i++) {
+      final prescription = prescriptions[i];
+      print('┌─────────────────────────────────────────────────┐');
+      print('│  Prescription #${i + 1}');
+      print('├─────────────────────────────────────────────────┤');
+      print('│  ID: ${prescription.prescriptionId}');
+      print('│  👨‍⚕️ Doctor: ${prescription.doctor.name}');
+      print('│  👤 Patient: ${prescription.patient.name}');
+      print('│  📅 Issued: ${prescription.issuedDate.toString().split(' ')[0]}');
+      print('│  📅 Expires: ${prescription.expiryDate.toString().split(' ')[0]}');
+      print('│  Status: ${prescription.status.toUpperCase()}');
+      print('│');
+      print('│  💊 MEDICINES (${prescription.medicines.length}):');
+      for (var med in prescription.medicines) {
+        print('│    • ${med.name} (${med.getMedicineType()})');
+        print('│      Dosage: ${med.dosage}');
+        print('│      Frequency: ${med.frequency}');
+        print('│      Instructions: ${med.instructions}');
+      }
+      if (prescription.notes.isNotEmpty) {
+        print('│');
+        print('│  📝 Notes: ${prescription.notes}');
+      }
+      print('└─────────────────────────────────────────────────┘');
+      print('');
     }
   }
 
@@ -195,45 +293,79 @@ class PrescriptionConsole {
     bool running = true;
     while (running) {
       displayMainMenu();
-      final choice = stdin.readLineSync() ?? '';
+      final choice = InputValidator.readIntInRange(
+        '\nEnter your choice (0-6): ',
+        0,
+        6,
+      );
 
       switch (choice) {
-        case '1':
+        case 1:
           createPrescription();
           break;
-        case '2':
+        case 2:
           viewAllPrescriptions();
           break;
-        case '3':
+        case 3:
           viewPatientPrescriptions();
           break;
-        case '4':
+        case 4:
           validatePrescription();
           break;
-        case '5':
+        case 5:
           viewStatistics();
           break;
-        case '6':
+        case 6:
           exportData();
           break;
-        case '7':
+        case 0:
           running = false;
-          print('\n✓ Thank you for using Prescription Management System!');
+          print('\n✅ Data saved successfully!');
+          print('✅ Thank you for using Hospital Prescription Management System!');
+          print('👋 Goodbye!');
           break;
         default:
-          print('✗ Invalid choice. Please try again.');
+          print('❌ Invalid choice. Please try again.');
+      }
+      
+      if (running) {
+        print('\nPress Enter to continue...');
+        stdin.readLineSync();
       }
     }
   }
 
   void viewStatistics() {
-    print('\n--- Prescription Statistics ---');
+    print('\n╔════════════════════════════════════════════════════╗');
+    print('║  📊 PRESCRIPTION STATISTICS & ANALYTICS            ║');
+    print('╚════════════════════════════════════════════════════╝');
+    
     final stats = prescriptionRepository.getStatistics();
-    print('Total Prescriptions: ${stats['totalPrescriptions']}');
-    print('Active Prescriptions: ${stats['activePrescriptions']}');
-    print('Completed Prescriptions: ${stats['completedPrescriptions']}');
-    print('Expired Prescriptions: ${stats['expiredPrescriptions']}');
-    print(
-        'Average Medicines per Prescription: ${stats['averageMedicinesPerPrescription']}');
+    final total = stats['totalPrescriptions'] as int;
+    final active = stats['activePrescriptions'] as int;
+    final completed = stats['completedPrescriptions'] as int;
+    final expired = stats['expiredPrescriptions'] as int;
+    
+    print('\n┌─────────────────────────────────────────────────┐');
+    print('│  📈 OVERVIEW                                    │');
+    print('├─────────────────────────────────────────────────┤');
+    print('│  Total Prescriptions: $total');
+    
+    if (total > 0) {
+      final activePercent = ((active / total) * 100).toStringAsFixed(1);
+      final completedPercent = ((completed / total) * 100).toStringAsFixed(1);
+      final expiredPercent = ((expired / total) * 100).toStringAsFixed(1);
+      
+      print('│  Active: $active ($activePercent%)');
+      print('│  Completed: $completed ($completedPercent%)');
+      print('│  Expired: $expired ($expiredPercent%)');
+      print('│');
+      print('│  Average Medicines per Prescription:');
+      print('│    ${stats['averageMedicinesPerPrescription']}');
+    } else {
+      print('│  No prescriptions in system yet.');
+    }
+    
+    print('└─────────────────────────────────────────────────┘');
   }
 }
