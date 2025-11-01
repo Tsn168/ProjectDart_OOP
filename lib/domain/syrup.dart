@@ -13,7 +13,7 @@ class Syrup extends Medicine {
     required String manufacturer,
     required DateTime expiryDate,
     required String frequency,
-    required String instructions,
+    required String instructions,  
     required this.flavor,
     required this.volumeMl,
     this.sugarFree = false,
