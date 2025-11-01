@@ -298,7 +298,5 @@
   ],
   "generator": "pub",
   "generatorVersion": "3.9.2",
-  "flutterRoot": "file:///Users/macbookpro/flutter",
-  "flutterVersion": "3.35.7",
   "pubCache": "file:///Users/macbookpro/.pub-cache"
 }
