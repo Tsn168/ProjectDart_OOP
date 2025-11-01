@@ -1,27 +1,19 @@
-import 'domain/medicine.dart';
-import 'data/seed_data.dart';
-import 'domain/prescription_service.dart';
-import 'data/prescription_repo.dart';
-import 'ui/ui_console.dart';
+import 'data/prescription_repository.dart';
+import 'ui/prescription_ui.dart';
 
 void main() {
-  // Load default/seed data (pre-populated from database)
-  final doctors = SeedData.getDefaultDoctors();
-  final patients = SeedData.getDefaultPatients();
-  final medicines = SeedData.getDefaultMedicines() as List<Medicine>;
+  // Initialize repository (loads prescriptions from JSON)
+  final repository = PrescriptionRepository();
 
-  final prescriptionRepository = PrescriptionRepository();
-  final prescriptionService = PrescriptionService();
+  // Display welcome message
+  print('\n╔════════════════════════════════════════════╗');
+  print('║  WELCOME TO PRESCRIPTION MANAGEMENT SYSTEM║');
+  print('║              Version 1.0                  ║');
+  print('╚════════════════════════════════════════════╝');
+  print('✓ System initialized successfully');
+  print('✓ Default Doctor: Dr. John Doe');
 
-  // Initialize console with pre-loaded data
-  final console = PrescriptionConsole(
-    prescriptionRepository,
-    prescriptionService,
-    doctors,
-    patients,
-    medicines,
-  );
-
-  prescriptionRepository.initialize();
-  console.run();
+  // Initialize and start UI
+  final ui = PrescriptionUI(repository);
+  ui.start();
 }
