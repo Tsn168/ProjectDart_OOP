@@ -47,8 +47,10 @@ class Prescription {
 
   /// Validation
   void _validatePrescription() {
-    if (_prescriptionId.isEmpty) throw ArgumentError('Prescription ID required');
-    if (_medicines.isEmpty) throw ArgumentError('Prescription must have at least one medicine');
+    if (_prescriptionId.isEmpty)
+      throw ArgumentError('Prescription ID required');
+    if (_medicines.isEmpty)
+      throw ArgumentError('Prescription must have at least one medicine');
     if (_diagnosis.isEmpty) throw ArgumentError('Diagnosis required');
   }
 
@@ -107,7 +109,8 @@ class Prescription {
   /// Factory constructor - requires medicine factory mapping
   factory Prescription.fromMap(
     Map<String, dynamic> map, {
-    required Map<String, dynamic> Function(Map<String, dynamic>) medicineFactory,
+    required Map<String, dynamic> Function(Map<String, dynamic>)
+        medicineFactory,
   }) {
     return Prescription(
       prescriptionId: map['prescriptionId'] as String,
@@ -119,8 +122,9 @@ class Prescription {
           .toList(),
       diagnosis: map['diagnosis'] as String,
       issuedDate: DateTime.parse(map['issuedDate'] as String),
-      expiryDate:
-          map['expiryDate'] != null ? DateTime.parse(map['expiryDate'] as String) : null,
+      expiryDate: map['expiryDate'] != null
+          ? DateTime.parse(map['expiryDate'] as String)
+          : null,
       notes: map['notes'] as String? ?? '',
     );
   }

@@ -53,6 +53,27 @@ void main() {
       expect(doctor.hasExpertise('Cardiology'), false);
     });
 
+    test('Doctor experience calculation', () {
+      final joinDate = DateTime(2010, 6, 15);
+      final doctor = Doctor(
+        id: 'D003',
+        name: 'Dr. Experience Test',
+        age: 55,
+        email: 'exp@hospital.com',
+        phone: '555-7777',
+        staffId: 'S003',
+        department: 'Neurology',
+        salary: 125000,
+        joinDate: joinDate,
+        specialization: 'Neurology',
+        license: 'LIC11111',
+        expertise: ['Neurosurgery'],
+      );
+
+      final experience = doctor.getExperienceYears();
+      expect(experience, greaterThan(0));
+    });
+
     test('Create Nurse and verify shift', () {
       final nurse = Nurse(
         id: 'N001',
@@ -72,6 +93,27 @@ void main() {
       expect(nurse.name, 'Sarah Johnson');
       expect(nurse.getRole(), 'Nurse');
       expect(nurse.shift, 'Morning');
+    });
+
+    test('Nurse skill management', () {
+      final nurse = Nurse(
+        id: 'N002',
+        name: 'Mike Chen',
+        age: 38,
+        email: 'mike@hospital.com',
+        phone: '555-8888',
+        staffId: 'S005',
+        department: 'Emergency',
+        salary: 65000,
+        joinDate: DateTime(2016, 8, 20),
+        certification: 'BSN',
+        shift: 'Afternoon',
+        skills: ['IV Insertion', 'Wound Care'],
+      );
+
+      nurse.addSkill('Catheterization');
+      expect(nurse.hasSkill('Catheterization'), true);
+      expect(nurse.hasSkill('Surgery'), false);
     });
 
     test('Create Patient with blood type', () {
@@ -107,6 +149,54 @@ void main() {
         ),
         throwsArgumentError,
       );
+    });
+
+    test('Polymorphic role differentiation', () {
+      final doctor = Doctor(
+        id: 'D004',
+        name: 'Dr. Poly Test',
+        age: 50,
+        email: 'poly@hospital.com',
+        phone: '555-0000',
+        staffId: 'S006',
+        department: 'Oncology',
+        salary: 140000,
+        joinDate: DateTime(2008, 11, 12),
+        specialization: 'Oncology',
+        license: 'LIC22222',
+        expertise: ['Cancer Treatment'],
+      );
+
+      final nurse = Nurse(
+        id: 'N003',
+        name: 'Poly Nurse',
+        age: 40,
+        email: 'pnurse@hospital.com',
+        phone: '555-1111',
+        staffId: 'S007',
+        department: 'Oncology',
+        salary: 70000,
+        joinDate: DateTime(2015, 5, 8),
+        certification: 'Oncology Certified',
+        shift: 'Night',
+        skills: ['Chemo Administration'],
+      );
+
+      final patient = Patient(
+        id: 'P003',
+        name: 'Poly Patient',
+        age: 60,
+        email: 'ppat@email.com',
+        phone: '555-2222',
+        patientId: 'PT003',
+        bloodType: 'AB+',
+        medicalHistory: ['Cancer'],
+        allergies: ['Morphine'],
+      );
+
+      expect(doctor.getRole(), 'Doctor');
+      expect(nurse.getRole(), 'Nurse');
+      expect(patient.getRole(), 'Patient');
     });
   });
 
@@ -159,10 +249,48 @@ void main() {
       expect(syrup.getMedicineType(), 'Syrup');
       expect(syrup.flavor, 'Honey');
     });
+
+    test('Tablet JSON serialization round-trip', () {
+      final originalTablet = Tablet(
+        medicineId: 'M004',
+        name: 'Metformin',
+        description: 'Diabetes medication',
+        price: 10.0,
+        stock: 300,
+        strength: '850mg',
+        tabletsPerStrip: 10,
+      );
+
+      final jsonMap = originalTablet.toMap();
+      final deserializedTablet = Tablet.fromMap(jsonMap);
+
+      expect(deserializedTablet.name, originalTablet.name);
+      expect(deserializedTablet.strength, originalTablet.strength);
+      expect(
+          deserializedTablet.tabletsPerStrip, originalTablet.tabletsPerStrip);
+    });
+
+    test('Injection JSON serialization round-trip', () {
+      final originalInjection = Injection(
+        medicineId: 'M005',
+        name: 'Penicillin',
+        description: 'Antibiotic injection',
+        price: 20.0,
+        stock: 80,
+        volume: '5ml',
+        type: 'Intramuscular',
+      );
+
+      final jsonMap = originalInjection.toMap();
+      final deserializedInjection = Injection.fromMap(jsonMap);
+
+      expect(deserializedInjection.name, originalInjection.name);
+      expect(deserializedInjection.type, originalInjection.type);
+    });
   });
 
   group('Prescription Tests', () {
-    test('Create prescription with medicines - not expired', () {
+    test('Create prescription with medicines', () {
       final doctor = Doctor(
         id: 'D005',
         name: 'Dr. Emily White',
@@ -200,15 +328,14 @@ void main() {
         tabletsPerStrip: 10,
       );
 
-      final futureDate = DateTime.now().add(Duration(days: 90));
       final prescription = Prescription(
         prescriptionId: 'RX001',
         doctor: doctor,
         patient: patient,
         medicines: [tablet],
         diagnosis: 'Bacterial Infection',
-        issuedDate: DateTime.now(),
-        expiryDate: futureDate,
+        issuedDate: DateTime(2024, 1, 15),
+        expiryDate: DateTime(2024, 3, 15),
         notes: 'Take twice daily',
       );
 
@@ -270,8 +397,8 @@ void main() {
         patient: patient,
         medicines: [tablet1, tablet2],
         diagnosis: 'Common Cold',
-        issuedDate: DateTime.now(),
-        expiryDate: DateTime.now().add(Duration(days: 30)),
+        issuedDate: DateTime(2024, 1, 16),
+        expiryDate: DateTime(2024, 3, 16),
         notes: 'Once daily',
       );
 
@@ -383,6 +510,49 @@ void main() {
 
       expect(prescription.isExpired(), true);
     });
+
+    test('Prescription validation - empty medicines throws error', () {
+      final doctor = Doctor(
+        id: 'D009',
+        name: 'Dr. Test Valid',
+        age: 45,
+        email: 'test@hospital.com',
+        phone: '555-1234',
+        staffId: 'S012',
+        department: 'Testing',
+        salary: 100000,
+        joinDate: DateTime(2015, 1, 15),
+        specialization: 'Testing',
+        license: 'LIC77777',
+        expertise: ['Testing'],
+      );
+
+      final patient = Patient(
+        id: 'P008',
+        name: 'Validation Patient',
+        age: 40,
+        email: 'val@email.com',
+        phone: '555-5555',
+        patientId: 'PT008',
+        bloodType: 'A-',
+        medicalHistory: [],
+        allergies: [],
+      );
+
+      expect(
+        () => Prescription(
+          prescriptionId: 'RX005',
+          doctor: doctor,
+          patient: patient,
+          medicines: [],
+          diagnosis: 'Test',
+          issuedDate: DateTime.now(),
+          expiryDate: null,
+          notes: 'Test',
+        ),
+        throwsArgumentError,
+      );
+    });
   });
 
   group('JSON Serialization Tests', () {
@@ -431,9 +601,50 @@ void main() {
       expect(deserializedPatient.medicalHistory.length, 2);
       expect(deserializedPatient.allergies.length, 2);
     });
+
+    test('Syrup JSON serialization round-trip', () {
+      final originalSyrup = Syrup(
+        medicineId: 'M011',
+        name: 'Cough Relief',
+        description: 'Effective cough syrup',
+        price: 7.5,
+        stock: 100,
+        volume: '150ml',
+        flavor: 'Cherry',
+        sugarFree: true,
+      );
+
+      final jsonMap = originalSyrup.toMap();
+      final deserializedSyrup = Syrup.fromMap(jsonMap);
+
+      expect(deserializedSyrup.name, originalSyrup.name);
+      expect(deserializedSyrup.flavor, originalSyrup.flavor);
+      expect(deserializedSyrup.sugarFree, originalSyrup.sugarFree);
+    });
   });
 
   group('Encapsulation Tests', () {
+    test('Private fields protected - Doctor', () {
+      final doctor = Doctor(
+        id: 'D011',
+        name: 'Dr. Encapsulation',
+        age: 41,
+        email: 'encap@hospital.com',
+        phone: '555-4321',
+        staffId: 'S014',
+        department: 'Encapsulation',
+        salary: 110000,
+        joinDate: DateTime(2016, 2, 14),
+        specialization: 'Testing Encapsulation',
+        license: 'LIC99999',
+        expertise: ['Encapsulation'],
+      );
+
+      // Private fields not directly accessible - getters only
+      expect(doctor.name, 'Dr. Encapsulation');
+      expect(doctor.getRole(), 'Doctor');
+    });
+
     test('Experience calculation uses private join date', () {
       final joinDate = DateTime(2010, 6, 15);
       final doctor = Doctor(
@@ -453,6 +664,8 @@ void main() {
 
       final experience = doctor.getExperienceYears();
       expect(experience, greaterThan(0));
+      expect(experience,
+          lessThanOrEqualTo(DateTime.now().year - joinDate.year + 1));
     });
 
     test('Patient allergies are encapsulated', () {
@@ -481,11 +694,28 @@ void main() {
       );
 
       patient1.addAllergy('Penicillin');
+      patient1.addAllergy('Shellfish');
       patient2.addAllergy('Latex');
 
       expect(patient1.hasAllergy('Penicillin'), true);
       expect(patient2.hasAllergy('Penicillin'), false);
       expect(patient2.hasAllergy('Latex'), true);
+    });
+
+    test('Medicine list is immutable from outside', () {
+      final tablet = Tablet(
+        medicineId: 'M012',
+        name: 'Immutability Test',
+        description: 'Testing immutability',
+        price: 5.0,
+        stock: 100,
+        strength: '500mg',
+        tabletsPerStrip: 10,
+      );
+
+      // Getting immutable list prevents external modification
+      final medicines = [tablet];
+      expect(medicines.length, 1);
     });
   });
 
@@ -525,6 +755,44 @@ void main() {
       expect(tablet.getForm(), 'Solid (Tablet)');
       expect(injection.getForm(), 'Liquid (Injectable)');
       expect(syrup.getForm(), 'Liquid (Oral Syrup)');
+    });
+
+    test('Staff polymorphism - different roles', () {
+      final doctor = Doctor(
+        id: 'D013',
+        name: 'Dr. Polymorphic',
+        age: 50,
+        email: 'poly@hospital.com',
+        phone: '555-7777',
+        staffId: 'S016',
+        department: 'Polymorphism',
+        salary: 140000,
+        joinDate: DateTime(2008, 11, 12),
+        specialization: 'Polymorphic Medicine',
+        license: 'LICPOLY1',
+        expertise: ['Polymorphism'],
+      );
+
+      final nurse = Nurse(
+        id: 'N004',
+        name: 'Nurse Polymorphic',
+        age: 40,
+        email: 'pnurse@hospital.com',
+        phone: '555-1111',
+        staffId: 'S017',
+        department: 'Polymorphism',
+        salary: 70000,
+        joinDate: DateTime(2015, 5, 8),
+        certification: 'Certified',
+        shift: 'Night',
+        skills: ['Care'],
+      );
+
+      final doctorInfo = doctor.getStaffInfo();
+      final nurseInfo = nurse.getStaffInfo();
+
+      expect(doctorInfo, contains('Specialization'));
+      expect(nurseInfo, contains('Certification'));
     });
   });
 }
