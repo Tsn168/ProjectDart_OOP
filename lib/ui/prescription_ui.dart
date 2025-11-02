@@ -66,67 +66,92 @@ class PrescriptionUI {
     print('║       ADD NEW PRESCRIPTION               ║');
     print('╚════════════════════════════════════════════╝');
 
-    // Get Doctor info
-    stdout.write('Enter doctor ID: ');
-    final doctorId = stdin.readLineSync() ?? 'DOC001';
+    // Select or create Doctor
+    print('\n--- DOCTOR SELECTION ---');
+    print('1. Use existing sample doctor (Dr. John Doe)');
+    print('2. Enter new doctor details');
+    stdout.write('Choose option (1 or 2): ');
+    final doctorOption = stdin.readLineSync() ?? '1';
 
-    stdout.write('Enter doctor name: ');
-    final doctorName = stdin.readLineSync() ?? '';
-    if (doctorName.isEmpty) {
-      print('✗ Doctor name cannot be empty.\n');
-      return;
+    Doctor doctor;
+    if (doctorOption == '1') {
+      // Use sample doctor
+      doctor = Doctor(
+        id: 'DOC001',
+        name: 'Dr. John Doe',
+        age: 45,
+        email: 'john.doe@hospital.com',
+        phone: '555-0101',
+        staffId: 'STAFF001',
+        department: 'Internal Medicine',
+        salary: 85000.0,
+        joinDate: DateTime(2015, 1, 15),
+        specialization: 'Internal Medicine',
+        license: 'LIC-2015-001',
+        expertise: ['Cardiology', 'Hypertension', 'Diabetes'],
+      );
+      print('✓ Using Dr. John Doe');
+    } else {
+      // Enter new doctor
+      stdout.write('Enter doctor name: ');
+      final doctorName = stdin.readLineSync() ?? '';
+      if (doctorName.isEmpty) {
+        print('✗ Doctor name cannot be empty.\n');
+        return;
+      }
+
+      stdout.write('Enter specialization: ');
+      final specialization = stdin.readLineSync() ?? 'General Practice';
+
+      stdout.write('Enter license number: ');
+      final license = stdin.readLineSync() ?? 'LIC001';
+
+      try {
+        doctor = Doctor(
+          id: 'DOC${DateTime.now().millisecondsSinceEpoch}',
+          name: doctorName,
+          age: 35,
+          email: 'doctor@hospital.com',
+          phone: '555-0000',
+          staffId: 'STAFF${DateTime.now().millisecondsSinceEpoch}',
+          department: 'General',
+          salary: 70000.0,
+          joinDate: DateTime.now(),
+          specialization: specialization,
+          license: license,
+          expertise: ['General Practice'],
+        );
+        print('✓ New doctor added: $doctorName');
+      } catch (e) {
+        print('✗ Error creating doctor: $e\n');
+        return;
+      }
     }
 
-    stdout.write('Enter doctor age: ');
-    final ageStr = stdin.readLineSync() ?? '30';
-    final age = int.tryParse(ageStr) ?? 30;
+    // Select or create Patient
+    print('\n--- PATIENT SELECTION ---');
+    print('1. Use sample patient (John Smith)');
+    print('2. Enter new patient details');
+    stdout.write('Choose option (1 or 2): ');
+    final patientOption = stdin.readLineSync() ?? '1';
 
-    stdout.write('Enter doctor email: ');
-    final email = stdin.readLineSync() ?? 'doctor@hospital.com';
-
-    stdout.write('Enter doctor phone: ');
-    final phone = stdin.readLineSync() ?? '123456789';
-
-    stdout.write('Enter staff ID: ');
-    final staffId = stdin.readLineSync() ?? 'STAFF001';
-
-    stdout.write('Enter department: ');
-    final department = stdin.readLineSync() ?? 'General';
-
-    stdout.write('Enter salary: ');
-    final salaryStr = stdin.readLineSync() ?? '50000';
-    final salary = double.tryParse(salaryStr) ?? 50000.0;
-
-    stdout.write('Enter specialization: ');
-    final specialization = stdin.readLineSync() ?? 'General Practice';
-
-    stdout.write('Enter license number: ');
-    final license = stdin.readLineSync() ?? 'LIC001';
-
-    stdout.write('Enter expertise (comma-separated): ');
-    final expertiseStr = stdin.readLineSync() ?? 'Internal Medicine';
-    final expertise = expertiseStr.split(',').map((e) => e.trim()).toList();
-
-    try {
-      final doctor = Doctor(
-        id: doctorId,
-        name: doctorName,
-        age: age,
-        email: email,
-        phone: phone,
-        staffId: staffId,
-        department: department,
-        salary: salary,
-        joinDate: DateTime.now(),
-        specialization: specialization,
-        license: license,
-        expertise: expertise,
+    Patient patient;
+    if (patientOption == '1') {
+      // Use sample patient
+      patient = Patient(
+        id: 'PAT001',
+        name: 'John Smith',
+        age: 52,
+        email: 'john.smith@email.com',
+        phone: '555-1001',
+        patientId: 'PAT001',
+        bloodType: 'O+',
+        medicalHistory: ['Hypertension', 'Type 2 Diabetes'],
+        allergies: ['Penicillin'],
       );
-
-      // Get Patient info
-      stdout.write('Enter patient ID: ');
-      final patientId = stdin.readLineSync() ?? 'PAT001';
-
+      print('✓ Using John Smith');
+    } else {
+      // Enter new patient
       stdout.write('Enter patient name: ');
       final patientName = stdin.readLineSync() ?? '';
       if (patientName.isEmpty) {
@@ -134,102 +159,75 @@ class PrescriptionUI {
         return;
       }
 
-      stdout.write('Enter patient age: ');
-      final patientAgeStr = stdin.readLineSync() ?? '25';
-      final patientAge = int.tryParse(patientAgeStr) ?? 25;
-
-      stdout.write('Enter patient email: ');
-      final patientEmail = stdin.readLineSync() ?? 'patient@email.com';
-
-      stdout.write('Enter patient phone: ');
-      final patientPhone = stdin.readLineSync() ?? '987654321';
-
-      stdout.write(
-          'Enter patient blood type (O+, O-, A+, A-, B+, B-, AB+, AB-): ');
+      stdout.write('Enter blood type (O+, O-, A+, A-, B+, B-, AB+, AB-): ');
       final bloodType = stdin.readLineSync() ?? 'O+';
 
-      stdout.write('Enter medical history (comma-separated): ');
-      final historyStr = stdin.readLineSync() ?? 'None';
-      final medicalHistory =
-          historyStr.split(',').map((e) => e.trim()).toList();
-
-      stdout.write('Enter allergies (comma-separated): ');
-      final allergiesStr = stdin.readLineSync() ?? 'None';
-      final allergies = allergiesStr.split(',').map((e) => e.trim()).toList();
-
-      final patient = Patient(
-        id: patientId,
-        name: patientName,
-        age: patientAge,
-        email: patientEmail,
-        phone: patientPhone,
-        patientId: patientId,
-        bloodType: bloodType,
-        medicalHistory: medicalHistory,
-        allergies: allergies,
-      );
-
-      // Get Prescription details
-      stdout.write('Enter prescription ID: ');
-      final prescriptionId =
-          stdin.readLineSync() ?? 'RX${DateTime.now().millisecondsSinceEpoch}';
-
-      stdout.write('Enter diagnosis: ');
-      final diagnosis = stdin.readLineSync() ?? 'General Checkup';
-
-      stdout.write('Enter prescription notes: ');
-      final notes = stdin.readLineSync() ?? 'Follow-up in 2 weeks';
-
-      stdout.write('Enter number of medicines: ');
-      final numMedicinesStr = stdin.readLineSync() ?? '1';
-      final numMedicines = int.tryParse(numMedicinesStr) ?? 1;
-
-      final medicines = <Tablet>[];
-      for (int i = 0; i < numMedicines; i++) {
-        stdout.write('Enter medicine ${i + 1} ID: ');
-        final medId = stdin.readLineSync() ?? 'MED00${i + 1}';
-
-        stdout.write('Enter medicine ${i + 1} name: ');
-        final medicineName = stdin.readLineSync() ?? '';
-
-        if (medicineName.isEmpty) continue;
-
-        stdout.write('Enter medicine description: ');
-        final description = stdin.readLineSync() ?? 'Standard medicine';
-
-        stdout.write('Enter medicine price: ');
-        final priceStr = stdin.readLineSync() ?? '10.0';
-        final price = double.tryParse(priceStr) ?? 10.0;
-
-        stdout.write('Enter stock quantity: ');
-        final stockStr = stdin.readLineSync() ?? '100';
-        final stock = int.tryParse(stockStr) ?? 100;
-
-        stdout.write('Enter tablet strength (e.g., 500mg): ');
-        final strength = stdin.readLineSync() ?? '500mg';
-
-        stdout.write('Enter tablets per strip: ');
-        final stripStr = stdin.readLineSync() ?? '10';
-        final tabletsPerStrip = int.tryParse(stripStr) ?? 10;
-
-        medicines.add(Tablet(
-          medicineId: medId,
-          name: medicineName,
-          description: description,
-          price: price,
-          stock: stock,
-          strength: strength,
-          tabletsPerStrip: tabletsPerStrip,
-        ));
-      }
-
-      if (medicines.isEmpty) {
-        print('✗ At least one medicine is required.\n');
+      try {
+        patient = Patient(
+          id: 'PAT${DateTime.now().millisecondsSinceEpoch}',
+          name: patientName,
+          age: 30,
+          email: 'patient@email.com',
+          phone: '555-2000',
+          patientId: 'PAT${DateTime.now().millisecondsSinceEpoch}',
+          bloodType: bloodType,
+          medicalHistory: [],
+          allergies: [],
+        );
+        print('✓ New patient added: $patientName');
+      } catch (e) {
+        print('✗ Error creating patient: $e\n');
         return;
       }
+    }
 
+    // Add medicines for prescription
+    print('\n--- MEDICINES ---');
+    stdout.write('Enter number of medicines (1-5): ');
+    final numMedicinesStr = stdin.readLineSync() ?? '1';
+    final numMedicines = int.tryParse(numMedicinesStr) ?? 1;
+
+    final medicines = <Tablet>[];
+    for (int i = 0; i < numMedicines; i++) {
+      stdout.write('Medicine ${i + 1} name: ');
+      final medicineName = stdin.readLineSync() ?? '';
+
+      if (medicineName.isEmpty) continue;
+
+      stdout.write('Strength (e.g., 500mg): ');
+      final strength = stdin.readLineSync() ?? '500mg';
+
+      stdout.write('Price: ');
+      final priceStr = stdin.readLineSync() ?? '10.0';
+      final price = double.tryParse(priceStr) ?? 10.0;
+
+      medicines.add(Tablet(
+        medicineId: 'MED${DateTime.now().millisecondsSinceEpoch}$i',
+        name: medicineName,
+        description: '$medicineName - $strength',
+        price: price,
+        stock: 100,
+        strength: strength,
+        tabletsPerStrip: 10,
+      ));
+    }
+
+    if (medicines.isEmpty) {
+      print('✗ At least one medicine is required.\n');
+      return;
+    }
+
+    // Prescription details
+    print('\n--- PRESCRIPTION DETAILS ---');
+    stdout.write('Diagnosis: ');
+    final diagnosis = stdin.readLineSync() ?? 'General Checkup';
+
+    stdout.write('Notes: ');
+    final notes = stdin.readLineSync() ?? 'Follow-up in 2 weeks';
+
+    try {
       final prescription = Prescription(
-        prescriptionId: prescriptionId,
+        prescriptionId: 'RX${DateTime.now().millisecondsSinceEpoch}',
         doctor: doctor,
         patient: patient,
         medicines: medicines,
