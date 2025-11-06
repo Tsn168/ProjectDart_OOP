@@ -1,94 +1,65 @@
 import 'doctor.dart';
 import 'patient.dart';
-import 'medicine.dart';
 
-/// Prescription class (composition pattern)
-/// Represents a medical prescription issued by a doctor to a patient
+/// Prescription class - Stores prescription details
 class Prescription {
-  final String _prescriptionId;
-  final Doctor _doctor;
-  final Patient _patient;
-  final List<Medicine> _medicines;
-  final String _diagnosis;
-  final DateTime _issuedDate;
-  final DateTime? _expiryDate;
-  final String _notes;
+  late int _prescriptionId; // Auto-increment
+  late DateTime _date;
+  late Patient _patient;
+  late String _sicknessType;
+  late Doctor _doctor;
+  late String _medicineDosage;
+  late String _advice;
 
-  /// Constructor
   Prescription({
-    required String prescriptionId,
-    required Doctor doctor,
+    int? prescriptionId,
+    required DateTime date,
     required Patient patient,
-    required List<Medicine> medicines,
-    required String diagnosis,
-    required DateTime issuedDate,
-    required DateTime? expiryDate,
-    required String notes,
-  })  : _prescriptionId = prescriptionId,
-        _doctor = doctor,
-        _patient = patient,
-        _medicines = medicines,
-        _diagnosis = diagnosis,
-        _issuedDate = issuedDate,
-        _expiryDate = expiryDate,
-        _notes = notes {
-    _validatePrescription();
+    required String sicknessType,
+    required Doctor doctor,
+    required String medicineDosage,
+    required String advice,
+  }) {
+    _prescriptionId = prescriptionId ?? 0;
+    _date = date;
+    _patient = patient;
+    _sicknessType = sicknessType;
+    _doctor = doctor;
+    _medicineDosage = medicineDosage;
+    _advice = advice;
   }
 
-  /// Getters (encapsulation)
-  String get prescriptionId => _prescriptionId;
-  Doctor get doctor => _doctor;
+  /// Getters - Encapsulation
+  int get prescriptionId => _prescriptionId;
+  DateTime get date => _date;
   Patient get patient => _patient;
-  List<Medicine> get medicines => List.unmodifiable(_medicines);
-  String get diagnosis => _diagnosis;
-  DateTime get issuedDate => _issuedDate;
-  DateTime? get expiryDate => _expiryDate;
-  String get notes => _notes;
+  String get sicknessType => _sicknessType;
+  Doctor get doctor => _doctor;
+  String get medicineDosage => _medicineDosage;
+  String get advice => _advice;
 
-  /// Validation
-  void _validatePrescription() {
-    if (_prescriptionId.isEmpty)
-      throw ArgumentError('Prescription ID required');
-    if (_medicines.isEmpty)
-      throw ArgumentError('Prescription must have at least one medicine');
-    if (_diagnosis.isEmpty) throw ArgumentError('Diagnosis required');
-  }
+  /// Setters for editing
+  set patient(Patient value) => _patient = value;
+  set sicknessType(String value) => _sicknessType = value;
+  set doctor(Doctor value) => _doctor = value;
+  set medicineDosage(String value) => _medicineDosage = value;
+  set advice(String value) => _advice = value;
 
-  /// Check if prescription is expired
-  bool isExpired() {
-    final expiry = _expiryDate;
-    if (expiry == null) return false;
-    return DateTime.now().isAfter(expiry);
-  }
-
-  /// Get total prescription cost
-  double getTotalCost() {
-    return _medicines.fold(0.0, (sum, medicine) => sum + medicine.price);
-  }
-
-  /// Get medicines count
-  int getMedicinesCount() {
-    return _medicines.length;
-  }
-
-  /// Display prescription information
+  /// Display prescription info
   String displayInfo() {
-    final status = isExpired() ? 'EXPIRED' : 'ACTIVE';
     return '''
-    ╔════════════════════════════════════════════╗
-    ║           PRESCRIPTION #$_prescriptionId
-    ╠════════════════════════════════════════════╣
-    ║ Status: $status
-    ║ Doctor: ${_doctor.name} (${_doctor.specialization})
-    ║ Patient: ${_patient.name} | Age: ${_patient.age}
-    ║ Blood Type: ${_patient.bloodType}
-    ║ Diagnosis: $_diagnosis
-    ║ Issued Date: ${_issuedDate.toLocal().toString().split('.')[0]}
-    ║ Expiry Date: ${_expiryDate?.toLocal().toString().split('.')[0] ?? 'No expiry'}
-    ║ Medicines: ${_medicines.length}
-    ║ Total Cost: \$${getTotalCost().toStringAsFixed(2)}
-    ║ Notes: $_notes
-    ╚════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════╗
+║          PRESCRIPTION #$_prescriptionId
+╠═══════════════════════════════════════════════════╣
+║ Date: ${_date.toString().split('.')[0]}
+║ Patient: ${_patient.name} | Age: ${_patient.age} | Gender: ${_patient.gender}
+║ Medical History: ${_patient.medicalHistory}
+║ Allergies: ${_patient.allergies}
+║ Sickness: $_sicknessType
+║ Doctor: ${_doctor.name} (${_doctor.specialization})
+║ Medicine Dosage: $_medicineDosage
+║ Advice: $_advice
+╚═══════════════════════════════════════════════════╝
     ''';
   }
 
@@ -96,40 +67,29 @@ class Prescription {
   Map<String, dynamic> toMap() {
     return {
       'prescriptionId': prescriptionId,
-      'doctor': doctor.toMap(),
+      'date': date.toIso8601String(),
       'patient': patient.toMap(),
-      'medicines': medicines.map((m) => m.toMap()).toList(),
-      'diagnosis': diagnosis,
-      'issuedDate': issuedDate.toIso8601String(),
-      'expiryDate': expiryDate?.toIso8601String(),
-      'notes': notes,
+      'sicknessType': sicknessType,
+      'doctor': doctor.toMap(),
+      'medicineDosage': medicineDosage,
+      'advice': advice,
     };
   }
 
-  /// Factory constructor - requires medicine factory mapping
-  factory Prescription.fromMap(
-    Map<String, dynamic> map, {
-    required Map<String, dynamic> Function(Map<String, dynamic>)
-        medicineFactory,
-  }) {
+  /// Factory constructor
+  factory Prescription.fromMap(Map<String, dynamic> map) {
     return Prescription(
-      prescriptionId: map['prescriptionId'] as String,
-      doctor: Doctor.fromMap(map['doctor'] as Map<String, dynamic>),
+      prescriptionId: map['prescriptionId'] as int,
+      date: DateTime.parse(map['date'] as String),
       patient: Patient.fromMap(map['patient'] as Map<String, dynamic>),
-      medicines: (map['medicines'] as List)
-          .map((m) => medicineFactory(m as Map<String, dynamic>))
-          .cast<Medicine>()
-          .toList(),
-      diagnosis: map['diagnosis'] as String,
-      issuedDate: DateTime.parse(map['issuedDate'] as String),
-      expiryDate: map['expiryDate'] != null
-          ? DateTime.parse(map['expiryDate'] as String)
-          : null,
-      notes: map['notes'] as String? ?? '',
+      sicknessType: map['sicknessType'] as String,
+      doctor: Doctor.fromMap(map['doctor'] as Map<String, dynamic>),
+      medicineDosage: map['medicineDosage'] as String,
+      advice: map['advice'] as String,
     );
   }
 
   @override
   String toString() =>
-      'Prescription(ID: $prescriptionId, Doctor: ${doctor.name}, Patient: ${patient.name})';
+      'Prescription(ID: $prescriptionId, Patient: ${patient.name}, Doctor: ${doctor.name})';
 }

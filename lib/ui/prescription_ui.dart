@@ -3,18 +3,42 @@ import '../data/prescription_repository.dart';
 import '../domain/prescription.dart';
 import '../domain/doctor.dart';
 import '../domain/patient.dart';
-import '../domain/tablet.dart';
 
-/// UI Layer for managing prescriptions
+/// Simple UI for prescription management
 class PrescriptionUI {
   final PrescriptionRepository repository;
+  final List<Doctor> defaultDoctors;
 
-  PrescriptionUI(this.repository);
+  PrescriptionUI(this.repository)
+      : defaultDoctors = [
+          Doctor(
+            id: 'DOC001',
+            name: 'Dr. Tep Somnang',
+            age: 45,
+            gender: 'Male',
+            specialization: 'General Medicine',
+          ),
+          Doctor(
+            id: 'DOC002',
+            name: 'Dr. Tet Elite',
+            age: 38,
+            gender: 'Female',
+            specialization: 'Child Specialist',
+          ),
+          Doctor(
+            id: 'DOC003',
+            name: 'Dr. Choeng Rayu',
+            age: 52,
+            gender: 'Male',
+            specialization: 'Heart Pressure',
+          ),
+        ];
 
+  /// Start the UI menu
   void start() {
     bool isRunning = true;
     while (isRunning) {
-      _displayMainMenu();
+      _displayMenu();
       final choice = stdin.readLineSync() ?? '';
 
       switch (choice.trim()) {
@@ -22,353 +46,387 @@ class PrescriptionUI {
           _addNewPrescription();
           break;
         case '2':
-          _viewAllPrescriptions();
-          break;
-        case '3':
-          _searchByPatient();
-          break;
-        case '4':
-          _searchByDoctor();
-          break;
-        case '5':
-          _viewActivePrescriptions();
-          break;
-        case '6':
           _deletePrescription();
           break;
-        case '7':
+        case '3':
+          _viewPrescriptions();
+          break;
+        case '4':
+          _editPrescription();
+          break;
+        case '5':
           isRunning = false;
-          print('\n✓ Exiting Prescription Management System. Goodbye!');
+          print('\n✓ Exiting. Thank you!');
           break;
         default:
-          print('✗ Invalid choice. Please enter a number between 1 and 7.\n');
+          print('✗ Invalid choice. Please enter 1-5.\n');
       }
     }
   }
 
-  void _displayMainMenu() {
-    print('\n╔════════════════════════════════════════════╗');
-    print('║   PRESCRIPTION MANAGEMENT SYSTEM         ║');
-    print('╠════════════════════════════════════════════╣');
-    print('║ 1. Add New Prescription                   ║');
-    print('║ 2. View All Prescriptions                ║');
-    print('║ 3. Search by Patient Name                ║');
-    print('║ 4. Search by Doctor Name                 ║');
-    print('║ 5. View Active Prescriptions             ║');
-    print('║ 6. Delete Prescription                   ║');
-    print('║ 7. Exit                                  ║');
-    print('╚════════════════════════════════════════════╝');
-    stdout.write('Enter your choice (1-7): ');
+  /// Display main menu
+  void _displayMenu() {
+    print('\n╔═══════════════════════════════════════════╗');
+    print('║   PRESCRIPTION MANAGEMENT SYSTEM        ║');
+    print('╠═══════════════════════════════════════════╣');
+    print('║ 1. Add New Prescription                  ║');
+    print('║ 2. Delete Prescription                   ║');
+    print('║ 3. View Prescriptions                    ║');
+    print('║ 4. Edit Prescription                     ║');
+    print('║ 5. Exit                                  ║');
+    print('╚═══════════════════════════════════════════╝');
+    stdout.write('Enter choice (1-5): ');
   }
 
+  /// Add new prescription
   void _addNewPrescription() {
-    print('\n╔════════════════════════════════════════════╗');
-    print('║       ADD NEW PRESCRIPTION               ║');
-    print('╚════════════════════════════════════════════╝');
+    print('\n╔═══════════════════════════════════════════╗');
+    print('║       ADD NEW PRESCRIPTION              ║');
+    print('╚═══════════════════════════════════════════╝');
 
-    // Select or create Doctor
-    print('\n--- DOCTOR SELECTION ---');
-    print('1. Use existing sample doctor (Dr. John Doe)');
-    print('2. Enter new doctor details');
-    stdout.write('Choose option (1 or 2): ');
-    final doctorOption = stdin.readLineSync() ?? '1';
+    // Prescription ID (auto-increment)
+    final prescriptionId = repository.getNextId();
+    print('\n✓ Prescription ID: $prescriptionId (auto-generated)');
 
-    Doctor doctor;
-    if (doctorOption == '1') {
-      // Use sample doctor
-      doctor = Doctor(
-        id: 'DOC001',
-        name: 'Dr. John Doe',
-        age: 45,
-        email: 'john.doe@hospital.com',
-        phone: '555-0101',
-        staffId: 'STAFF001',
-        department: 'Internal Medicine',
-        salary: 85000.0,
-        joinDate: DateTime(2015, 1, 15),
-        specialization: 'Internal Medicine',
-        license: 'LIC-2015-001',
-        expertise: ['Cardiology', 'Hypertension', 'Diabetes'],
-      );
-      print('✓ Using Dr. John Doe');
-    } else {
-      // Enter new doctor
-      stdout.write('Enter doctor name: ');
-      final doctorName = stdin.readLineSync() ?? '';
-      if (doctorName.isEmpty) {
-        print('✗ Doctor name cannot be empty.\n');
-        return;
-      }
-
-      stdout.write('Enter specialization: ');
-      final specialization = stdin.readLineSync() ?? 'General Practice';
-
-      stdout.write('Enter license number: ');
-      final license = stdin.readLineSync() ?? 'LIC001';
-
-      try {
-        doctor = Doctor(
-          id: 'DOC${DateTime.now().millisecondsSinceEpoch}',
-          name: doctorName,
-          age: 35,
-          email: 'doctor@hospital.com',
-          phone: '555-0000',
-          staffId: 'STAFF${DateTime.now().millisecondsSinceEpoch}',
-          department: 'General',
-          salary: 70000.0,
-          joinDate: DateTime.now(),
-          specialization: specialization,
-          license: license,
-          expertise: ['General Practice'],
-        );
-        print('✓ New doctor added: $doctorName');
-      } catch (e) {
-        print('✗ Error creating doctor: $e\n');
-        return;
-      }
-    }
-
-    // Select or create Patient
-    print('\n--- PATIENT SELECTION ---');
-    print('1. Use sample patient (John Smith)');
-    print('2. Enter new patient details');
-    stdout.write('Choose option (1 or 2): ');
-    final patientOption = stdin.readLineSync() ?? '1';
-
-    Patient patient;
-    if (patientOption == '1') {
-      // Use sample patient
-      patient = Patient(
-        id: 'PAT001',
-        name: 'John Smith',
-        age: 52,
-        email: 'john.smith@email.com',
-        phone: '555-1001',
-        patientId: 'PAT001',
-        bloodType: 'O+',
-        medicalHistory: ['Hypertension', 'Type 2 Diabetes'],
-        allergies: ['Penicillin'],
-      );
-      print('✓ Using John Smith');
-    } else {
-      // Enter new patient
-      stdout.write('Enter patient name: ');
-      final patientName = stdin.readLineSync() ?? '';
-      if (patientName.isEmpty) {
-        print('✗ Patient name cannot be empty.\n');
-        return;
-      }
-
-      stdout.write('Enter blood type (O+, O-, A+, A-, B+, B-, AB+, AB-): ');
-      final bloodType = stdin.readLineSync() ?? 'O+';
-
-      try {
-        patient = Patient(
-          id: 'PAT${DateTime.now().millisecondsSinceEpoch}',
-          name: patientName,
-          age: 30,
-          email: 'patient@email.com',
-          phone: '555-2000',
-          patientId: 'PAT${DateTime.now().millisecondsSinceEpoch}',
-          bloodType: bloodType,
-          medicalHistory: [],
-          allergies: [],
-        );
-        print('✓ New patient added: $patientName');
-      } catch (e) {
-        print('✗ Error creating patient: $e\n');
-        return;
-      }
-    }
-
-    // Add medicines for prescription
-    print('\n--- MEDICINES ---');
-    stdout.write('Enter number of medicines (1-5): ');
-    final numMedicinesStr = stdin.readLineSync() ?? '1';
-    final numMedicines = int.tryParse(numMedicinesStr) ?? 1;
-
-    final medicines = <Tablet>[];
-    for (int i = 0; i < numMedicines; i++) {
-      stdout.write('Medicine ${i + 1} name: ');
-      final medicineName = stdin.readLineSync() ?? '';
-
-      if (medicineName.isEmpty) continue;
-
-      stdout.write('Strength (e.g., 500mg): ');
-      final strength = stdin.readLineSync() ?? '500mg';
-
-      stdout.write('Price: ');
-      final priceStr = stdin.readLineSync() ?? '10.0';
-      final price = double.tryParse(priceStr) ?? 10.0;
-
-      medicines.add(Tablet(
-        medicineId: 'MED${DateTime.now().millisecondsSinceEpoch}$i',
-        name: medicineName,
-        description: '$medicineName - $strength',
-        price: price,
-        stock: 100,
-        strength: strength,
-        tabletsPerStrip: 10,
-      ));
-    }
-
-    if (medicines.isEmpty) {
-      print('✗ At least one medicine is required.\n');
-      return;
-    }
-
-    // Prescription details
-    print('\n--- PRESCRIPTION DETAILS ---');
-    stdout.write('Diagnosis: ');
-    final diagnosis = stdin.readLineSync() ?? 'General Checkup';
-
-    stdout.write('Notes: ');
-    final notes = stdin.readLineSync() ?? 'Follow-up in 2 weeks';
-
+    // Date
+    print('Enter date (YYYY-MM-DD): ');
+    final dateStr =
+        stdin.readLineSync() ?? DateTime.now().toString().split(' ')[0];
+    DateTime date;
     try {
-      final prescription = Prescription(
-        prescriptionId: 'RX${DateTime.now().millisecondsSinceEpoch}',
-        doctor: doctor,
-        patient: patient,
-        medicines: medicines,
-        diagnosis: diagnosis,
-        issuedDate: DateTime.now(),
-        expiryDate: DateTime.now().add(Duration(days: 30)),
-        notes: notes,
-      );
-
-      repository.addPrescription(prescription);
-      print('\n✓ Prescription added successfully!');
-      print('Prescription ID: ${prescription.prescriptionId}');
-      print('Total Cost: \$${prescription.getTotalCost().toStringAsFixed(2)}');
+      date = DateTime.parse(dateStr);
     } catch (e) {
-      print('✗ Error creating prescription: $e\n');
-    }
-  }
-
-  void _viewAllPrescriptions() {
-    print('\n╔════════════════════════════════════════════╗');
-    print('║       ALL PRESCRIPTIONS                  ║');
-    print('╚════════════════════════════════════════════╝');
-
-    final prescriptions = repository.getAllPrescriptions();
-
-    if (prescriptions.isEmpty) {
-      print('ℹ No prescriptions found in the system.\n');
-      return;
+      date = DateTime.now();
+      print('ℹ Using today\'s date: ${date.toString().split(' ')[0]}');
     }
 
-    print('Total Prescriptions: ${prescriptions.length}\n');
-    for (final prescription in prescriptions) {
-      print(prescription.displayInfo());
-    }
-  }
-
-  void _searchByPatient() {
-    print('\n╔════════════════════════════════════════════╗');
-    print('║      SEARCH BY PATIENT NAME              ║');
-    print('╚════════════════════════════════════════════╝');
-
-    stdout.write('Enter patient name to search: ');
+    // Patient name
+    stdout.write('Enter patient name: ');
     final patientName = stdin.readLineSync() ?? '';
-
     if (patientName.isEmpty) {
       print('✗ Patient name cannot be empty.\n');
       return;
     }
 
-    final results = repository.searchByPatientName(patientName);
-
-    if (results.isEmpty) {
-      print('ℹ No prescriptions found for patient: "$patientName"\n');
+    // Type of sickness
+    stdout.write('Enter type of sickness: ');
+    final sicknessType = stdin.readLineSync() ?? '';
+    if (sicknessType.isEmpty) {
+      print('✗ Sickness type cannot be empty.\n');
       return;
     }
 
-    print('Found ${results.length} prescription(s) for "$patientName":\n');
-    for (final prescription in results) {
+    // Age
+    stdout.write('Enter patient age: ');
+    final ageStr = stdin.readLineSync() ?? '0';
+    final age = int.tryParse(ageStr) ?? 0;
+    if (age <= 0) {
+      print('✗ Invalid age.\n');
+      return;
+    }
+
+    // Gender
+    stdout.write('Enter patient gender (M/F): ');
+    final genderInput = stdin.readLineSync()?.toUpperCase() ?? 'M';
+    final gender =
+        (genderInput == 'F' || genderInput == 'Female') ? 'Female' : 'Male';
+
+    // Select doctor
+    print('\n--- SELECT DOCTOR ---');
+    for (int i = 0; i < defaultDoctors.length; i++) {
+      print(
+          '${i + 1}. ${defaultDoctors[i].name} (${defaultDoctors[i].specialization})');
+    }
+    stdout.write('Choose doctor (1-${defaultDoctors.length}): ');
+    final doctorChoice = stdin.readLineSync() ?? '1';
+    final doctorIndex = (int.tryParse(doctorChoice) ?? 1) - 1;
+    final doctor = (doctorIndex >= 0 && doctorIndex < defaultDoctors.length)
+        ? defaultDoctors[doctorIndex]
+        : defaultDoctors[0];
+    print('✓ Selected: ${doctor.name}');
+
+    // Medicine dosage
+    stdout.write('Enter medicine dosage (e.g., 500mg x2): ');
+    final medicineDosage = stdin.readLineSync() ?? '';
+    if (medicineDosage.isEmpty) {
+      print('✗ Medicine dosage cannot be empty.\n');
+      return;
+    }
+
+    // Advice
+    stdout.write('Enter doctor\'s advice: ');
+    final advice = stdin.readLineSync() ?? '';
+    if (advice.isEmpty) {
+      print('✗ Advice cannot be empty.\n');
+      return;
+    }
+
+    // Create prescription
+    try {
+      // Create Patient object
+      final patient = Patient(
+        id: 'PAT${DateTime.now().millisecondsSinceEpoch}',
+        name: patientName,
+        age: age,
+        gender: gender,
+        medicalHistory: '', // Could be added in future enhancements
+        allergies: '', // Could be added in future enhancements
+      );
+
+      final prescription = Prescription(
+        prescriptionId: prescriptionId,
+        date: date,
+        patient: patient,
+        sicknessType: sicknessType,
+        doctor: doctor,
+        medicineDosage: medicineDosage,
+        advice: advice,
+      );
+
+      repository.addPrescription(prescription);
       print(prescription.displayInfo());
+    } catch (e) {
+      print('✗ Error: $e\n');
     }
   }
 
-  void _searchByDoctor() {
-    print('\n╔════════════════════════════════════════════╗');
-    print('║       SEARCH BY DOCTOR NAME              ║');
-    print('╚════════════════════════════════════════════╝');
-
-    stdout.write('Enter doctor name to search: ');
-    final doctorName = stdin.readLineSync() ?? '';
-
-    if (doctorName.isEmpty) {
-      print('✗ Doctor name cannot be empty.\n');
-      return;
-    }
-
-    final results = repository.searchByDoctorName(doctorName);
-
-    if (results.isEmpty) {
-      print('ℹ No prescriptions found for doctor: "$doctorName"\n');
-      return;
-    }
-
-    print('Found ${results.length} prescription(s) by "$doctorName":\n');
-    for (final prescription in results) {
-      print(prescription.displayInfo());
-    }
-  }
-
-  void _viewActivePrescriptions() {
-    print('\n╔════════════════════════════════════════════╗');
-    print('║      ACTIVE PRESCRIPTIONS                ║');
-    print('╚════════════════════════════════════════════╝');
-
-    final activePrescriptions = repository.getActivePrescriptions();
-
-    if (activePrescriptions.isEmpty) {
-      print('ℹ No active prescriptions found.\n');
-      return;
-    }
-
-    print('Active Prescriptions: ${activePrescriptions.length}\n');
-    for (final prescription in activePrescriptions) {
-      print(prescription.displayInfo());
-    }
-  }
-
+  /// Delete prescription
   void _deletePrescription() {
-    print('\n╔════════════════════════════════════════════╗');
-    print('║      DELETE PRESCRIPTION                 ║');
-    print('╚════════════════════════════════════════════╝');
+    print('\n╔═══════════════════════════════════════════╗');
+    print('║       DELETE PRESCRIPTION               ║');
+    print('╚═══════════════════════════════════════════╝');
 
-    stdout.write('Enter prescription ID to delete: ');
-    final prescriptionId = stdin.readLineSync() ?? '';
+    print('\nDelete by:');
+    print('1. Prescription ID');
+    print('2. Patient Name');
+    stdout.write('Choose (1-2): ');
+    final choice = stdin.readLineSync() ?? '1';
 
-    if (prescriptionId.isEmpty) {
-      print('✗ Prescription ID cannot be empty.\n');
-      return;
-    }
+    if (choice == '1') {
+      // Delete by ID
+      stdout.write('Enter prescription ID: ');
+      final idStr = stdin.readLineSync() ?? '';
+      final id = int.tryParse(idStr);
+      if (id == null) {
+        print('✗ Invalid ID.\n');
+        return;
+      }
 
-    final prescription = repository.getPrescriptionById(prescriptionId);
-    if (prescription == null) {
-      print('✗ Prescription with ID "$prescriptionId" not found.\n');
-      return;
-    }
+      final success = repository.deletePrescriptionById(id);
+      if (!success) {
+        print('✗ Prescription #$id not found.\n');
+      }
+    } else if (choice == '2') {
+      // Delete by patient name
+      stdout.write('Enter patient name: ');
+      final name = stdin.readLineSync() ?? '';
+      if (name.isEmpty) {
+        print('✗ Patient name cannot be empty.\n');
+        return;
+      }
 
-    print('\nPrescription to delete:');
-    print(prescription.displayInfo());
-
-    stdout
-        .write('Are you sure you want to delete this prescription? (yes/no): ');
-    final confirm = stdin.readLineSync()?.toLowerCase() ?? '';
-
-    if (confirm == 'yes' || confirm == 'y') {
-      final success = repository.deletePrescription(prescriptionId);
-      if (success) {
-        print('✓ Prescription deleted successfully.\n');
-      } else {
-        print('✗ Failed to delete prescription.\n');
+      final deleted = repository.deleteByPatientName(name);
+      if (deleted == 0) {
+        print('✗ No prescriptions found for: $name\n');
       }
     } else {
-      print('✓ Deletion cancelled.\n');
+      print('✗ Invalid choice.\n');
     }
+  }
+
+  /// View prescriptions
+  void _viewPrescriptions() {
+    print('\n╔═══════════════════════════════════════════╗');
+    print('║       VIEW PRESCRIPTIONS                ║');
+    print('╚═══════════════════════════════════════════╝');
+
+    print('\nView:');
+    print('1. All Prescriptions');
+    print('2. Search by Patient Name');
+    stdout.write('Choose (1-2): ');
+    final choice = stdin.readLineSync() ?? '1';
+
+    List<Prescription> results = [];
+
+    if (choice == '1') {
+      results = repository.getAllPrescriptions();
+    } else if (choice == '2') {
+      stdout.write('Enter patient name: ');
+      final name = stdin.readLineSync() ?? '';
+      if (name.isEmpty) {
+        print('✗ Patient name cannot be empty.\n');
+        return;
+      }
+      results = repository.searchByPatientName(name);
+    } else {
+      print('✗ Invalid choice.\n');
+      return;
+    }
+
+    if (results.isEmpty) {
+      print('ℹ No prescriptions found.\n');
+      return;
+    }
+
+    print('\n✓ Found ${results.length} prescription(s):\n');
+    for (final prescription in results) {
+      print(prescription.displayInfo());
+    }
+  }
+
+  /// Edit prescription
+  void _editPrescription() {
+    print('\n╔═══════════════════════════════════════════╗');
+    print('║       EDIT PRESCRIPTION                 ║');
+    print('╚═══════════════════════════════════════════╝');
+
+    print('\nFind by:');
+    print('1. Prescription ID');
+    print('2. Patient Name');
+    stdout.write('Choose (1-2): ');
+    final choice = stdin.readLineSync() ?? '1';
+
+    Prescription? prescription;
+
+    if (choice == '1') {
+      stdout.write('Enter prescription ID: ');
+      final idStr = stdin.readLineSync() ?? '';
+      final id = int.tryParse(idStr);
+      if (id == null) {
+        print('✗ Invalid ID.\n');
+        return;
+      }
+      prescription = repository.getPrescriptionById(id);
+      if (prescription == null) {
+        print('✗ Prescription #$id not found.\n');
+        return;
+      }
+    } else if (choice == '2') {
+      stdout.write('Enter patient name: ');
+      final name = stdin.readLineSync() ?? '';
+      final results = repository.searchByPatientName(name);
+      if (results.isEmpty) {
+        print('✗ No prescriptions found for: $name\n');
+        return;
+      }
+      if (results.length > 1) {
+        print(
+            'Found ${results.length} prescriptions. Editing the first one...\n');
+      }
+      prescription = results[0];
+    } else {
+      print('✗ Invalid choice.\n');
+      return;
+    }
+
+    print('\nCurrent prescription:');
+    print(prescription.displayInfo());
+
+    print('What to edit?');
+    print('1. Patient Name');
+    print('2. Sickness Type');
+    print('3. Age');
+    print('4. Gender');
+    print('5. Doctor');
+    print('6. Medicine Dosage');
+    print('7. Advice');
+    print('8. Cancel');
+    stdout.write('Choose (1-8): ');
+    final editChoice = stdin.readLineSync() ?? '8';
+
+    switch (editChoice) {
+      case '1':
+        stdout.write('Enter new patient name: ');
+        final newName = stdin.readLineSync() ?? '';
+        if (newName.isNotEmpty) {
+          final updatedPatient = Patient(
+            id: prescription.patient.id,
+            name: newName,
+            age: prescription.patient.age,
+            gender: prescription.patient.gender,
+            medicalHistory: prescription.patient.medicalHistory,
+            allergies: prescription.patient.allergies,
+          );
+          prescription.patient = updatedPatient;
+        }
+        break;
+      case '2':
+        stdout.write('Enter new sickness type: ');
+        final newSickness = stdin.readLineSync() ?? '';
+        if (newSickness.isNotEmpty) {
+          prescription.sicknessType = newSickness;
+        }
+        break;
+      case '3':
+        stdout.write('Enter new age: ');
+        final newAgeStr = stdin.readLineSync() ?? '';
+        final newAge = int.tryParse(newAgeStr);
+        if (newAge != null && newAge > 0) {
+          final updatedPatient = Patient(
+            id: prescription.patient.id,
+            name: prescription.patient.name,
+            age: newAge,
+            gender: prescription.patient.gender,
+            medicalHistory: prescription.patient.medicalHistory,
+            allergies: prescription.patient.allergies,
+          );
+          prescription.patient = updatedPatient;
+        }
+        break;
+      case '4':
+        stdout.write('Enter new gender (M/F): ');
+        final newGenderInput = stdin.readLineSync()?.toUpperCase() ?? 'M';
+        final newGender = (newGenderInput == 'F' || newGenderInput == 'Female')
+            ? 'Female'
+            : 'Male';
+        final updatedPatient = Patient(
+          id: prescription.patient.id,
+          name: prescription.patient.name,
+          age: prescription.patient.age,
+          gender: newGender,
+          medicalHistory: prescription.patient.medicalHistory,
+          allergies: prescription.patient.allergies,
+        );
+        prescription.patient = updatedPatient;
+        break;
+      case '5':
+        print('\n--- SELECT DOCTOR ---');
+        for (int i = 0; i < defaultDoctors.length; i++) {
+          print(
+              '${i + 1}. ${defaultDoctors[i].name} (${defaultDoctors[i].specialization})');
+        }
+        stdout.write('Choose doctor (1-${defaultDoctors.length}): ');
+        final doctorChoice = stdin.readLineSync() ?? '1';
+        final doctorIndex = (int.tryParse(doctorChoice) ?? 1) - 1;
+        if (doctorIndex >= 0 && doctorIndex < defaultDoctors.length) {
+          prescription.doctor = defaultDoctors[doctorIndex];
+        }
+        break;
+      case '6':
+        stdout.write('Enter new medicine dosage: ');
+        final newDosage = stdin.readLineSync() ?? '';
+        if (newDosage.isNotEmpty) {
+          prescription.medicineDosage = newDosage;
+        }
+        break;
+      case '7':
+        stdout.write('Enter new advice: ');
+        final newAdvice = stdin.readLineSync() ?? '';
+        if (newAdvice.isNotEmpty) {
+          prescription.advice = newAdvice;
+        }
+        break;
+      case '8':
+        print('✓ Edit cancelled.\n');
+        return;
+      default:
+        print('✗ Invalid choice.\n');
+        return;
+    }
+
+    // Save updated prescription
+    repository.updatePrescription(prescription.prescriptionId, prescription);
+    print('\n✓ Updated:');
+    print(prescription.displayInfo());
   }
 }

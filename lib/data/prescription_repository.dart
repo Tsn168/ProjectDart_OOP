@@ -2,17 +2,24 @@ import 'dart:convert';
 import 'dart:io';
 import '../domain/prescription.dart';
 
-/// Repository for managing prescriptions with JSON persistence
+/// Repository for managing prescriptions with auto-increment ID
 class PrescriptionRepository {
   final String filePath = 'data/prescriptions.json';
   late List<Prescription> prescriptions;
+  late int _nextId;
 
   PrescriptionRepository() {
     prescriptions = [];
+    _nextId = 1;
     _loadFromJson();
   }
 
-  /// Load prescriptions from JSON file
+  /// Get next prescription ID (auto-increment)
+  int getNextId() {
+    return _nextId++;
+  }
+
+  /// Load prescriptions from JSON
   void _loadFromJson() {
     try {
       final file = File(filePath);
@@ -20,23 +27,30 @@ class PrescriptionRepository {
         final jsonString = file.readAsStringSync();
         final jsonList = jsonDecode(jsonString) as List;
         prescriptions = jsonList.map((item) {
-          return Prescription.fromMap(
-            item as Map<String, dynamic>,
-            medicineFactory: _medicineFactory,
-          );
+          return Prescription.fromMap(item as Map<String, dynamic>);
         }).toList();
+
+        // Find max ID to continue auto-increment
+        if (prescriptions.isNotEmpty) {
+          _nextId = prescriptions
+                  .map((p) => p.prescriptionId)
+                  .reduce((a, b) => a > b ? a : b) +
+              1;
+        }
         print('✓ Loaded ${prescriptions.length} prescriptions from file');
       } else {
         print('ℹ No existing prescriptions file. Starting fresh.');
         prescriptions = [];
+        _nextId = 1;
       }
     } catch (e) {
       print('✗ Error loading prescriptions: $e');
       prescriptions = [];
+      _nextId = 1;
     }
   }
 
-  /// Save prescriptions to JSON file
+  /// Save prescriptions to JSON
   void _saveToJson() {
     try {
       final dir = Directory('data');
@@ -54,23 +68,18 @@ class PrescriptionRepository {
     }
   }
 
-  /// Factory for deserializing medicine objects
-  Map<String, dynamic> _medicineFactory(Map<String, dynamic> map) {
-    return map;
-  }
-
-  /// Add a new prescription
+  /// Add new prescription
   void addPrescription(Prescription prescription) {
     prescriptions.add(prescription);
     _saveToJson();
-    print('✓ Prescription added: ${prescription.prescriptionId}');
+    print('✓ Prescription #${prescription.prescriptionId} added');
   }
 
   /// Get all prescriptions
   List<Prescription> getAllPrescriptions() => prescriptions;
 
   /// Get prescription by ID
-  Prescription? getPrescriptionById(String id) {
+  Prescription? getPrescriptionById(int id) {
     try {
       return prescriptions.firstWhere((p) => p.prescriptionId == id);
     } catch (e) {
@@ -85,35 +94,48 @@ class PrescriptionRepository {
         .toList();
   }
 
-  /// Search prescriptions by doctor name
-  List<Prescription> searchByDoctorName(String name) {
-    return prescriptions
-        .where((p) => p.doctor.name.toLowerCase().contains(name.toLowerCase()))
-        .toList();
-  }
-
-  /// Delete a prescription
-  bool deletePrescription(String id) {
+  /// Delete prescription by ID
+  bool deletePrescriptionById(int id) {
     final initialLength = prescriptions.length;
     prescriptions.removeWhere((p) => p.prescriptionId == id);
     if (prescriptions.length < initialLength) {
       _saveToJson();
-      print('✓ Prescription deleted: $id');
+      print('✓ Prescription #$id deleted');
       return true;
     }
     return false;
   }
 
+  /// Delete prescriptions by patient name
+  int deleteByPatientName(String name) {
+    final initialLength = prescriptions.length;
+    prescriptions
+        .removeWhere((p) => p.patient.name.toLowerCase() == name.toLowerCase());
+    final deleted = initialLength - prescriptions.length;
+    if (deleted > 0) {
+      _saveToJson();
+      print('✓ $deleted prescription(s) deleted for patient: $name');
+    }
+    return deleted;
+  }
+
+  /// Update prescription
+  bool updatePrescription(int id, Prescription updatedData) {
+    try {
+      final index = prescriptions.indexWhere((p) => p.prescriptionId == id);
+      if (index != -1) {
+        prescriptions[index] = updatedData;
+        _saveToJson();
+        print('✓ Prescription #$id updated');
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('✗ Error updating prescription: $e');
+      return false;
+    }
+  }
+
   /// Get total number of prescriptions
   int getTotal() => prescriptions.length;
-
-  /// Get expired prescriptions
-  List<Prescription> getExpiredPrescriptions() {
-    return prescriptions.where((p) => p.isExpired()).toList();
-  }
-
-  /// Get active prescriptions
-  List<Prescription> getActivePrescriptions() {
-    return prescriptions.where((p) => !p.isExpired()).toList();
-  }
 }
