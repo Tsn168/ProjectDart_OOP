@@ -56,10 +56,10 @@ class PrescriptionUI {
           break;
         case '5':
           isRunning = false;
-          print('\n✓ Exiting. Thank you!');
+          print('\n[OK] Exiting. Thank you!');
           break;
         default:
-          print('✗ Invalid choice. Please enter 1-5.\n');
+          print('[ERROR] Invalid choice. Please enter 1-5.\n');
       }
     }
   }
@@ -86,7 +86,7 @@ class PrescriptionUI {
 
     // Prescription ID (auto-increment)
     final prescriptionId = repository.getNextId();
-    print('\n✓ Prescription ID: $prescriptionId (auto-generated)');
+    print('\n[OK] Prescription ID: $prescriptionId (auto-generated)');
 
     // Date
     print('Enter date (YYYY-MM-DD): ');
@@ -97,14 +97,14 @@ class PrescriptionUI {
       date = DateTime.parse(dateStr);
     } catch (e) {
       date = DateTime.now();
-      print('ℹ Using today\'s date: ${date.toString().split(' ')[0]}');
+      print('[INFO] Using today\'s date: ${date.toString().split(' ')[0]}');
     }
 
     // Patient name
     stdout.write('Enter patient name: ');
     final patientName = stdin.readLineSync() ?? '';
     if (patientName.isEmpty) {
-      print('✗ Patient name cannot be empty.\n');
+      print('[ERROR] Patient name cannot be empty.\n');
       return;
     }
 
@@ -112,7 +112,7 @@ class PrescriptionUI {
     stdout.write('Enter type of sickness: ');
     final sicknessType = stdin.readLineSync() ?? '';
     if (sicknessType.isEmpty) {
-      print('✗ Sickness type cannot be empty.\n');
+      print('[ERROR] Sickness type cannot be empty.\n');
       return;
     }
 
@@ -121,7 +121,7 @@ class PrescriptionUI {
     final ageStr = stdin.readLineSync() ?? '0';
     final age = int.tryParse(ageStr) ?? 0;
     if (age <= 0) {
-      print('✗ Invalid age.\n');
+      print('[ERROR] Invalid age.\n');
       return;
     }
 
@@ -143,13 +143,13 @@ class PrescriptionUI {
     final doctor = (doctorIndex >= 0 && doctorIndex < defaultDoctors.length)
         ? defaultDoctors[doctorIndex]
         : defaultDoctors[0];
-    print('✓ Selected: ${doctor.name}');
+    print('[OK] Selected: ${doctor.name}');
 
     // Medicine dosage
     stdout.write('Enter medicine dosage (e.g., 500mg x2): ');
     final medicineDosage = stdin.readLineSync() ?? '';
     if (medicineDosage.isEmpty) {
-      print('✗ Medicine dosage cannot be empty.\n');
+      print('[ERROR] Medicine dosage cannot be empty.\n');
       return;
     }
 
@@ -157,7 +157,7 @@ class PrescriptionUI {
     stdout.write('Enter doctor\'s advice: ');
     final advice = stdin.readLineSync() ?? '';
     if (advice.isEmpty) {
-      print('✗ Advice cannot be empty.\n');
+      print('[ERROR] Advice cannot be empty.\n');
       return;
     }
 
@@ -186,7 +186,7 @@ class PrescriptionUI {
       repository.addPrescription(prescription);
       print(prescription.displayInfo());
     } catch (e) {
-      print('✗ Error: $e\n');
+      print('[ERROR] Error: $e\n');
     }
   }
 
@@ -209,26 +209,26 @@ class PrescriptionUI {
       final idStr = stdin.readLineSync() ?? '';
       final id = int.tryParse(idStr);
       if (id == null) {
-        print('✗ Invalid ID.\n');
+        print('[ERROR] Invalid ID.\n');
         return;
       }
 
       final success = repository.deletePrescriptionById(id);
       if (!success) {
-        print('✗ Prescription #$id not found.\n');
+        print('[ERROR] Prescription #$id not found.\n');
       }
     } else if (choice == '2') {
       // Delete by patient name
       stdout.write('Enter patient name: ');
       final name = stdin.readLineSync() ?? '';
       if (name.isEmpty) {
-        print('✗ Patient name cannot be empty.\n');
+        print('[ERROR] Patient name cannot be empty.\n');
         return;
       }
 
       final deleted = repository.deleteByPatientName(name);
       if (deleted == 0) {
-        print('✗ No prescriptions found for: $name\n');
+        print('[ERROR] No prescriptions found for: $name\n');
       }
     } else if (choice == '3') {
       // Show patients first, then delete
@@ -237,16 +237,16 @@ class PrescriptionUI {
       stdout.write('\nEnter patient name to delete prescriptions (or press Enter to cancel): ');
       final name = stdin.readLineSync() ?? '';
       if (name.isEmpty) {
-        print('✗ Deletion cancelled.\n');
+        print('[ERROR] Deletion cancelled.\n');
         return;
       }
 
       final deleted = repository.deleteByPatientName(name);
       if (deleted == 0) {
-        print('✗ No prescriptions found for: $name\n');
+        print('[ERROR] No prescriptions found for: $name\n');
       }
     } else {
-      print('✗ Invalid choice.\n');
+      print('[ERROR] Invalid choice.\n');
     }
   }
 
@@ -274,7 +274,7 @@ class PrescriptionUI {
       stdout.write('\nEnter patient name to search: ');
       final name = stdin.readLineSync() ?? '';
       if (name.isEmpty) {
-        print('✗ Patient name cannot be empty.\n');
+        print('[ERROR] Patient name cannot be empty.\n');
         return;
       }
       results = repository.searchByPatientName(name);
@@ -289,16 +289,16 @@ class PrescriptionUI {
       }
       results = repository.searchByPatientName(name);
     } else {
-      print('✗ Invalid choice.\n');
+      print('[ERROR] Invalid choice.\n');
       return;
     }
 
     if (results.isEmpty) {
-      print('ℹ No prescriptions found.\n');
+      print('[INFO] No prescriptions found.\n');
       return;
     }
 
-    print('\n✓ Found ${results.length} prescription(s):\n');
+    print('\n[OK] Found ${results.length} prescription(s):\n');
     for (final prescription in results) {
       print(prescription.displayInfo());
     }
@@ -309,7 +309,7 @@ class PrescriptionUI {
     final allPrescriptions = repository.getAllPrescriptions();
     
     if (allPrescriptions.isEmpty) {
-      print('\nℹ No patients found in the system.\n');
+      print('\n[INFO] No patients found in the system.\n');
       return;
     }
 
@@ -367,12 +367,12 @@ class PrescriptionUI {
       final idStr = stdin.readLineSync() ?? '';
       final id = int.tryParse(idStr);
       if (id == null) {
-        print('✗ Invalid ID.\n');
+        print('[ERROR] Invalid ID.\n');
         return;
       }
       prescription = repository.getPrescriptionById(id);
       if (prescription == null) {
-        print('✗ Prescription #$id not found.\n');
+        print('[ERROR] Prescription #$id not found.\n');
         return;
       }
     } else if (choice == '2') {
@@ -380,7 +380,7 @@ class PrescriptionUI {
       final name = stdin.readLineSync() ?? '';
       final results = repository.searchByPatientName(name);
       if (results.isEmpty) {
-        print('✗ No prescriptions found for: $name\n');
+        print('[ERROR] No prescriptions found for: $name\n');
         return;
       }
       if (results.length > 1) {
@@ -389,7 +389,7 @@ class PrescriptionUI {
       }
       prescription = results[0];
     } else {
-      print('✗ Invalid choice.\n');
+      print('[ERROR] Invalid choice.\n');
       return;
     }
 
@@ -491,16 +491,16 @@ class PrescriptionUI {
         }
         break;
       case '8':
-        print('✓ Edit cancelled.\n');
+        print('[OK] Edit cancelled.\n');
         return;
       default:
-        print('✗ Invalid choice.\n');
+        print('[ERROR] Invalid choice.\n');
         return;
     }
 
     // Save updated prescription
     repository.updatePrescription(prescription.prescriptionId, prescription);
-    print('\n✓ Updated:');
+    print('\n[OK] Updated:');
     print(prescription.displayInfo());
   }
 }

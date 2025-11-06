@@ -37,14 +37,14 @@ class PrescriptionRepository {
                   .reduce((a, b) => a > b ? a : b) +
               1;
         }
-        print('✓ Loaded ${prescriptions.length} prescriptions from file');
+        print('[OK] Loaded ${prescriptions.length} prescriptions from file');
       } else {
-        print('ℹ No existing prescriptions file. Starting fresh.');
+        print('[INFO] No existing prescriptions file. Starting fresh.');
         prescriptions = [];
         _nextId = 1;
       }
     } catch (e) {
-      print('✗ Error loading prescriptions: $e');
+      print('[ERROR] Error loading prescriptions: $e');
       prescriptions = [];
       _nextId = 1;
     }
@@ -62,9 +62,9 @@ class PrescriptionRepository {
       final jsonList = prescriptions.map((p) => p.toMap()).toList();
       final jsonString = jsonEncode(jsonList);
       file.writeAsStringSync(jsonString);
-      print('✓ Prescriptions saved to file');
+      print('[OK] Prescriptions saved to file');
     } catch (e) {
-      print('✗ Error saving prescriptions: $e');
+      print('[ERROR] Error saving prescriptions: $e');
     }
   }
 
@@ -72,7 +72,7 @@ class PrescriptionRepository {
   void addPrescription(Prescription prescription) {
     prescriptions.add(prescription);
     _saveToJson();
-    print('✓ Prescription #${prescription.prescriptionId} added');
+    print('[OK] Prescription #${prescription.prescriptionId} added');
   }
 
   /// Get all prescriptions
@@ -100,7 +100,7 @@ class PrescriptionRepository {
     prescriptions.removeWhere((p) => p.prescriptionId == id);
     if (prescriptions.length < initialLength) {
       _saveToJson();
-      print('✓ Prescription #$id deleted');
+      print('[OK] Prescription #$id deleted');
       return true;
     }
     return false;
@@ -114,7 +114,7 @@ class PrescriptionRepository {
     final deleted = initialLength - prescriptions.length;
     if (deleted > 0) {
       _saveToJson();
-      print('✓ $deleted prescription(s) deleted for patient: $name');
+      print('[OK] $deleted prescription(s) deleted for patient: $name');
     }
     return deleted;
   }
@@ -126,12 +126,12 @@ class PrescriptionRepository {
       if (index != -1) {
         prescriptions[index] = updatedData;
         _saveToJson();
-        print('✓ Prescription #$id updated');
+        print('[OK] Prescription #$id updated');
         return true;
       }
       return false;
     } catch (e) {
-      print('✗ Error updating prescription: $e');
+      print('[ERROR] Error updating prescription: $e');
       return false;
     }
   }
