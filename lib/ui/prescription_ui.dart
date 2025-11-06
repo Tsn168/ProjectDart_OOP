@@ -199,7 +199,8 @@ class PrescriptionUI {
     print('\nDelete by:');
     print('1. Prescription ID');
     print('2. Patient Name');
-    stdout.write('Choose (1-2): ');
+    print('3. Show Patients First'); // NEW OPTION
+    stdout.write('Choose (1-3): ');
     final choice = stdin.readLineSync() ?? '1';
 
     if (choice == '1') {
@@ -229,6 +230,21 @@ class PrescriptionUI {
       if (deleted == 0) {
         print('✗ No prescriptions found for: $name\n');
       }
+    } else if (choice == '3') {
+      // Show patients first, then delete
+      _showPatientList();
+      
+      stdout.write('\nEnter patient name to delete prescriptions (or press Enter to cancel): ');
+      final name = stdin.readLineSync() ?? '';
+      if (name.isEmpty) {
+        print('✗ Deletion cancelled.\n');
+        return;
+      }
+
+      final deleted = repository.deleteByPatientName(name);
+      if (deleted == 0) {
+        print('✗ No prescriptions found for: $name\n');
+      }
     } else {
       print('✗ Invalid choice.\n');
     }
@@ -243,7 +259,8 @@ class PrescriptionUI {
     print('\nView:');
     print('1. All Prescriptions');
     print('2. Search by Patient Name');
-    stdout.write('Choose (1-2): ');
+    print('3. Show All Patients First'); // NEW OPTION
+    stdout.write('Choose (1-3): ');
     final choice = stdin.readLineSync() ?? '1';
 
     List<Prescription> results = [];
@@ -251,10 +268,23 @@ class PrescriptionUI {
     if (choice == '1') {
       results = repository.getAllPrescriptions();
     } else if (choice == '2') {
-      stdout.write('Enter patient name: ');
+      // Show patient list before search
+      _showPatientList();
+      
+      stdout.write('\nEnter patient name to search: ');
       final name = stdin.readLineSync() ?? '';
       if (name.isEmpty) {
         print('✗ Patient name cannot be empty.\n');
+        return;
+      }
+      results = repository.searchByPatientName(name);
+    } else if (choice == '3') {
+      // Just show patient list
+      _showPatientList();
+      
+      stdout.write('\nEnter patient name to view prescriptions (or press Enter to cancel): ');
+      final name = stdin.readLineSync() ?? '';
+      if (name.isEmpty) {
         return;
       }
       results = repository.searchByPatientName(name);
@@ -272,6 +302,50 @@ class PrescriptionUI {
     for (final prescription in results) {
       print(prescription.displayInfo());
     }
+  }
+
+  /// Show list of all patients with prescriptions
+  void _showPatientList() {
+    final allPrescriptions = repository.getAllPrescriptions();
+    
+    if (allPrescriptions.isEmpty) {
+      print('\nℹ No patients found in the system.\n');
+      return;
+    }
+
+    // Get unique patients
+    final patientNames = <String>{};
+    final patientData = <Map<String, dynamic>>[];
+    
+    for (final prescription in allPrescriptions) {
+      final patientName = prescription.patient.name;
+      if (!patientNames.contains(patientName)) {
+        patientNames.add(patientName);
+        patientData.add({
+          'name': patientName,
+          'id': prescription.patient.id,
+          'age': prescription.patient.age,
+          'gender': prescription.patient.gender,
+          'prescriptions': allPrescriptions
+              .where((p) => p.patient.name == patientName)
+              .length,
+        });
+      }
+    }
+
+    print('\n╔═══════════════════════════════════════════════════════════╗');
+    print('║              PATIENTS IN SYSTEM (${patientData.length})                     ║');
+    print('╠═══════════════════════════════════════════════════════════╣');
+    
+    for (var i = 0; i < patientData.length; i++) {
+      final patient = patientData[i];
+      print('║ ${(i + 1).toString().padRight(2)}. ${patient['name'].toString().padRight(25)} │ Age: ${patient['age'].toString().padLeft(3)} │ ${patient['gender']} │');
+      print('║     ID: ${patient['id'].toString().padRight(15)} │ Prescriptions: ${patient['prescriptions']} │');
+      if (i < patientData.length - 1) {
+        print('╠───────────────────────────────────────────────────────────╣');
+      }
+    }
+    print('╚═══════════════════════════════════════════════════════════╝');
   }
 
   /// Edit prescription
