@@ -52,4 +52,39 @@ class Patient extends Person {
   @override
   String toString() =>
       'Patient(ID: $id, Name: $name, Medical History: $medicalHistory)';
+
+
+  // ALGORITHMS AND COMPUTED DATA
+
+  /// Algorithm: Check if patient is a minor (under 18)
+  bool isMinor() {
+    return age < 18;
+  }
+
+  /// Algorithm: Get age category for medical purposes
+  String getAgeCategory() {
+    if (age < 2) return 'Infant';
+    if (age < 13) return 'Child';
+    if (age < 18) return 'Teenager';
+    if (age < 65) return 'Adult';
+    return 'Senior';
+  }
+
+  /// Algorithm: Check if patient has any allergies
+  bool hasAllergies() {
+    return _allergies.isNotEmpty && _allergies.toLowerCase() != 'none';
+  }
+
+  /// Algorithm: Check if allergic to specific medication
+  bool isAllergicTo(String medication) {
+    if (!hasAllergies()) return false;
+    return _allergies.toLowerCase().contains(medication.toLowerCase());
+  }
+
+  /// Algorithm: Get patient risk level based on age and allergies
+  String getRiskLevel() {
+    if (age >= 65 && hasAllergies()) return 'HIGH';
+    if (age < 18 || hasAllergies()) return 'MEDIUM';
+    return 'LOW';
+  }
 }

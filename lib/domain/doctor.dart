@@ -49,4 +49,15 @@ class Doctor extends Person {
 
   @override
   String toString() => 'Dr. $name ($specialization)';
+
+  // ========================================
+  // ALGORITHMS AND COMPUTED DATA
+  // ========================================
+
+  /// Algorithm: Check if doctor can treat pediatric patients
+  bool canTreatChildren() {
+    return specialization.toLowerCase().contains('pediatric') ||
+        specialization.toLowerCase().contains('child') ||
+        specialization.toLowerCase().contains('family');
+  }
 }
