@@ -305,4 +305,85 @@ void main() {
       expect(prescription.getUrgencyText(), equals('MEDIUM'));
     });
   });
+
+  group('Input Validation Tests', () {
+    test('Should reject negative age for Patient', () {
+      expect(
+        () => Patient(
+          id: 'P999',
+          name: 'Invalid Patient',
+          age: -5,
+          gender: 'Male',
+          medicalHistory: 'N/A',
+          allergies: 'None',
+        ),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('Should reject age greater than 150 for Patient', () {
+      expect(
+        () => Patient(
+          id: 'P999',
+          name: 'Invalid Patient',
+          age: 200,
+          gender: 'Male',
+          medicalHistory: 'N/A',
+          allergies: 'None',
+        ),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('Should reject negative age for Doctor', () {
+      expect(
+        () => Doctor(
+          id: 'D999',
+          name: 'Invalid Doctor',
+          age: -10,
+          gender: 'Male',
+          specialization: 'General',
+        ),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('Should accept valid age for Patient', () {
+      final patient = Patient(
+        id: 'P100',
+        name: 'Valid Patient',
+        age: 30,
+        gender: 'Male',
+        medicalHistory: 'Healthy',
+        allergies: 'None',
+      );
+
+      expect(patient.age, equals(30));
+    });
+
+    test('Should accept boundary age values', () {
+      // Age 0 should be valid (newborn)
+      final newborn = Patient(
+        id: 'P101',
+        name: 'Newborn',
+        age: 0,
+        gender: 'Female',
+        medicalHistory: 'N/A',
+        allergies: 'None',
+      );
+
+      // Age 150 should be valid (boundary)
+      final oldest = Patient(
+        id: 'P102',
+        name: 'Oldest',
+        age: 150,
+        gender: 'Male',
+        medicalHistory: 'N/A',
+        allergies: 'None',
+      );
+
+      expect(newborn.age, equals(0));
+      expect(oldest.age, equals(150));
+    });
+  });
 }

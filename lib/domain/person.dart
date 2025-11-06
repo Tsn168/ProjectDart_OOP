@@ -14,7 +14,15 @@ abstract class Person {
   })  : _id = id,
         _name = name,
         _age = age,
-        _gender = gender;
+        _gender = gender {
+    // Validate age
+    if (age < 0) {
+      throw ArgumentError('Age cannot be negative. Received: $age');
+    }
+    if (age > 150) {
+      throw ArgumentError('Age cannot be greater than 150. Received: $age');
+    }
+  }
 
   /// Getters - Encapsulation
   String get id => _id;
