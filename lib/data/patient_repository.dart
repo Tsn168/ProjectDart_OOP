@@ -3,16 +3,18 @@ import 'dart:convert';
 import '../domain/entities/patient.dart';
 import '../domain/entities/allergy.dart';
 import '../domain/enums/allergy_severity.dart';
+import 'repository.dart';
 
 /// Repository for managing patients with auto-incrementing IDs
-class PatientRepository {
+/// Demonstrates: Implements Repository interface (Polymorphism)
+class PatientRepository implements Repository<Patient> {
   final List<Patient> _patients = [];
   final String _dataFile = 'data/patients.json';
   final bool _testMode;
 
   PatientRepository({bool testMode = false}) : _testMode = testMode {
     if (!_testMode) {
-      _loadFromFile();
+      loadFromFile();
     } else {
       _initializeDefaultData();
     }
@@ -28,8 +30,41 @@ class PatientRepository {
     final id = _generateNextId();
     final patient = Patient(id: id, name: name, allergies: allergies);
     _patients.add(patient);
-    _saveToFile();
+    saveToFile();
     return patient;
+  }
+
+  /// Get all patients - Implements Repository interface
+  @override
+  List<Patient> getAll() => getAllPatients();
+
+  /// Get patient by ID - Implements Repository interface
+  @override
+  Patient? getById(String id) => getPatientById(id);
+
+  /// Create new patient - Implements Repository interface
+  @override
+  Patient create(Patient patient) {
+    _patients.add(patient);
+    saveToFile();
+    return patient;
+  }
+
+  /// Update patient - Implements Repository interface
+  @override
+  void update(Patient patient) {
+    final index = _patients.indexWhere((p) => p.id == patient.id);
+    if (index != -1) {
+      _patients[index] = patient;
+      saveToFile();
+    }
+  }
+
+  /// Delete patient - Implements Repository interface
+  @override
+  void delete(String id) {
+    _patients.removeWhere((p) => p.id == id);
+    saveToFile();
   }
 
   /// Get all patients
@@ -46,8 +81,9 @@ class PatientRepository {
     }
   }
 
-  /// Load patients from JSON file
-  void _loadFromFile() {
+  /// Load patients from JSON file - Implements Repository interface
+  @override
+  void loadFromFile() {
     try {
       final file = File(_dataFile);
       if (file.existsSync()) {
@@ -63,8 +99,9 @@ class PatientRepository {
     }
   }
 
-  /// Save patients to JSON file
-  void _saveToFile() {
+  /// Save patients to JSON file - Implements Repository interface
+  @override
+  void saveToFile() {
     try {
       final file = File(_dataFile);
       file.createSync(recursive: true);
@@ -93,6 +130,6 @@ class PatientRepository {
       name: 'Bob Wilson',
       allergies: [Allergy(substance: 'Aspirin', severity: AllergySeverity.medium)],
     ));
-    _saveToFile();
+    saveToFile();
   }
 }
