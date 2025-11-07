@@ -63,7 +63,7 @@ class PrescriptionRepository {
   void deactivatePrescription(String prescriptionId) {
     final prescription = getPrescriptionById(prescriptionId);
     if (prescription != null) {
-      prescription.isActive = false;
+      prescription.deactivate();
       _saveToFile();
     }
   }
