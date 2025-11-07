@@ -1,6 +1,6 @@
 import '../domain/entities/patient.dart';
 import '../domain/entities/medication.dart';
-import '../domain/enums/allergy_severity.dart';
+import '../domain/enums/enums.dart';
 
 /// Service for checking medication safety (allergy conflicts)
 class SafetyService {

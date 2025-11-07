@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 import 'package:medication_manager/domain/entities/medication.dart';
-import 'package:medication_manager/domain/enums/medication_form.dart';
+import 'package:medication_manager/domain/enums/enums.dart';
 import 'package:medication_manager/data/medication_repository.dart';
 
 void main() {

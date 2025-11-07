@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 import 'package:medication_manager/domain/entities/patient.dart';
 import 'package:medication_manager/domain/entities/allergy.dart';
-import 'package:medication_manager/domain/enums/allergy_severity.dart';
+import 'package:medication_manager/domain/enums/enums.dart';
 import 'package:medication_manager/data/patient_repository.dart';
 
 void main() {

@@ -1,4 +1,4 @@
-import '../enums/allergy_severity.dart';
+import '../enums/enums.dart';
 import 'entity.dart';
 
 class Allergy extends Entity {

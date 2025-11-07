@@ -1,4 +1,4 @@
-import '../enums/medication_form.dart';
+import '../enums/enums.dart';
 import 'entity.dart';
 
 /// Entity representing a medication

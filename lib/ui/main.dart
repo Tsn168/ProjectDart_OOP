@@ -5,7 +5,7 @@ import '../data/prescription_repository.dart';
 import '../data/staff_repository.dart';
 import '../data/safety_service.dart';
 import '../domain/entities/medical_staff.dart';
-import '../domain/enums/staff_role.dart';
+import '../domain/enums/enums.dart';
 
 void main() {
   final app = MedicationManagerApp();

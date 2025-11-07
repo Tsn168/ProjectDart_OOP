@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import '../domain/entities/patient.dart';
 import '../domain/entities/allergy.dart';
-import '../domain/enums/allergy_severity.dart';
+import '../domain/enums/enums.dart';
 import 'repository.dart';
 
 /// Repository for managing patients with auto-incrementing IDs

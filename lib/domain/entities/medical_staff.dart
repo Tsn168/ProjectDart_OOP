@@ -1,4 +1,4 @@
-import '../enums/staff_role.dart';
+import '../enums/enums.dart';
 import 'entity.dart';
 
 /// Base class for medical staff - Demonstrates: Inheritance
@@ -86,4 +86,50 @@ class Nurse extends BaseMedicalStaff {
 
   @override
   String toString() => '[$id] $name (${role.name})';
+}
+
+/// Legacy class for backward compatibility
+class MedicalStaff extends BaseMedicalStaff {
+  MedicalStaff({
+    required String id,
+    required String name,
+    required StaffRole role,
+  }) : super(
+    id: id,
+    name: name,
+    role: role,
+  );
+
+  @override
+  String getPermission() {
+    return role == StaffRole.doctor
+        ? 'Can create prescriptions'
+        : 'Can administer medications';
+  }
+
+  /// Factory constructor - Polymorphism
+  factory MedicalStaff.fromJson(Map<String, dynamic> json) {
+    return MedicalStaff(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      role: StaffRole.values.firstWhere(
+        (e) => e.name == json['role'],
+      ),
+    );
+  }
+
+  /// Convert to JSON
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'role': role.name,
+    };
+  }
+
+  @override
+  String toString() {
+    return '[$id] $name (${role.name})';
+  }
 }

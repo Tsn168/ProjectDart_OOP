@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import '../domain/entities/medication.dart';
-import '../domain/enums/medication_form.dart';
+import '../domain/enums/enums.dart';
 
 /// Repository for managing medications with auto-incrementing IDs
 class MedicationRepository {

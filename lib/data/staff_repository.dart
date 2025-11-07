@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import '../domain/entities/medical_staff.dart';
-import '../domain/enums/staff_role.dart';
+import '../domain/enums/enums.dart';
 
 class StaffRepository {
   final List<MedicalStaff> _staff = [];
