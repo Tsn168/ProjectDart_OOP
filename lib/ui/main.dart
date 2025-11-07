@@ -87,7 +87,7 @@ class MedicationManagerApp {
     _nurseMenu(nurse);
   }
 
-  void _doctorMenu(MedicalStaff doctor) {
+  void _doctorMenu(BaseMedicalStaff doctor) {
     while (true) {
       print('\n${'═' * 40}');
       print('👨‍⚕️ Welcome ${doctor.name}!');
@@ -115,7 +115,7 @@ class MedicationManagerApp {
     }
   }
 
-  void _nurseMenu(MedicalStaff nurse) {
+  void _nurseMenu(BaseMedicalStaff nurse) {
     while (true) {
       print('\n${'═' * 40}');
       print('👩‍⚕️ Welcome ${nurse.name}!');
@@ -157,7 +157,7 @@ class MedicationManagerApp {
     }
   }
 
-  void _createPrescription(MedicalStaff doctor) {
+  void _createPrescription(BaseMedicalStaff doctor) {
     _viewPatientsAndMedications();
 
     final patientId = _getInput('\nSelect Patient ID (or 0 to cancel): ');
@@ -180,7 +180,8 @@ class MedicationManagerApp {
 
     // Check for allergy conflicts
     if (SafetyService.hasAllergyConflict(patient, medication)) {
-      final allergyDetails = SafetyService.getAllergyDetails(patient, medication);
+      final allergyDetails =
+          SafetyService.getAllergyDetails(patient, medication);
       print('\n🛑 SAFETY ALERT: Patient allergic to $allergyDetails!');
       final confirm = _getInput('Create prescription anyway? (y/n): ');
       if (confirm.toLowerCase() != 'y') {
@@ -216,7 +217,8 @@ class MedicationManagerApp {
 
     for (var prescription in prescriptions) {
       final patient = patientRepo.getPatientById(prescription.patientId);
-      final medication = medicationRepo.getMedicationById(prescription.medicationId);
+      final medication =
+          medicationRepo.getMedicationById(prescription.medicationId);
       final doctor = staffRepo.getStaffById(prescription.doctorId);
 
       print('[${prescription.id}] ${patient?.name ?? 'Unknown'} - '
@@ -229,7 +231,8 @@ class MedicationManagerApp {
   void _recordMedicationGiven() {
     _viewActivePrescriptions();
 
-    final prescriptionId = _getInput('Select Prescription ID (or 0 to cancel): ');
+    final prescriptionId =
+        _getInput('Select Prescription ID (or 0 to cancel): ');
     if (prescriptionId == '0') return;
 
     final prescription = prescriptionRepo.getPrescriptionById(prescriptionId);
@@ -243,7 +246,8 @@ class MedicationManagerApp {
       return;
     }
 
-    final medication = medicationRepo.getMedicationById(prescription.medicationId);
+    final medication =
+        medicationRepo.getMedicationById(prescription.medicationId);
     if (medication == null) {
       print('❌ Medication not found.\n');
       return;
@@ -263,7 +267,8 @@ class MedicationManagerApp {
     prescriptionRepo.deactivatePrescription(prescription.id);
 
     print('\n✅ Medication administered successfully!');
-    print('${medication.name} stock updated: ${medication.stockQuantity + 1} → ${medication.stockQuantity}\n');
+    print(
+        '${medication.name} stock updated: ${medication.stockQuantity + 1} → ${medication.stockQuantity}\n');
   }
 
   String _getInput(String prompt) {

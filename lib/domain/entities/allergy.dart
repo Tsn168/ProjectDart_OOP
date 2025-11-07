@@ -1,8 +1,6 @@
 import '../enums/allergy_severity.dart';
 import 'entity.dart';
 
-/// Entity representing an allergy
-/// Demonstrates: Inheritance from Entity base class
 class Allergy extends Entity {
   final String substance;
   final AllergySeverity severity;
@@ -13,9 +11,8 @@ class Allergy extends Entity {
   });
 
   @override
-  String get id => substance; // Using substance as unique identifier
+  String get id => substance;
 
-  /// Factory constructor for polymorphism
   factory Allergy.fromJson(Map<String, dynamic> json) {
     return Allergy(
       substance: json['substance'] as String,

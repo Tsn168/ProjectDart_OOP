@@ -1,13 +1,10 @@
 import 'allergy.dart';
 import 'entity.dart';
 
-/// Entity representing a patient
-/// Demonstrates: Inheritance, encapsulation of allergies
 class Patient extends Entity {
   final String id;
   final String name;
-  
-  /// Private variable with getter - Encapsulation
+
   final List<Allergy> _allergies;
 
   Patient({
@@ -16,19 +13,17 @@ class Patient extends Entity {
     required List<Allergy> allergies,
   }) : _allergies = List.unmodifiable(allergies); // Immutable list
 
-  /// Getter for allergies - Encapsulation
   List<Allergy> get allergies => _allergies;
-  
-  /// Check if patient has any allergies - Business logic encapsulated
+
   bool hasAllergies() => _allergies.isNotEmpty;
-  
-  /// Get allergy details as string - Encapsulation
+
   String getAllergyInfo() {
     if (_allergies.isEmpty) return 'No allergies';
-    return _allergies.map((a) => '${a.substance}-${a.severity.name}').join(', ');
+    return _allergies
+        .map((a) => '${a.substance}-${a.severity.name}')
+        .join(', ');
   }
 
-  /// Factory constructor - Polymorphism
   factory Patient.fromJson(Map<String, dynamic> json) {
     return Patient(
       id: json['id'] as String,
