@@ -1,0 +1,8 @@
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.vscode/
+.idea/
+.DS_Store
