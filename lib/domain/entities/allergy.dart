@@ -1,6 +1,5 @@
 import '../enums/allergy_severity.dart';
 
-/// Entity representing an allergy
 class Allergy {
   final String substance;
   final AllergySeverity severity;
@@ -10,7 +9,6 @@ class Allergy {
     required this.severity,
   });
 
-  /// Convert from JSON
   factory Allergy.fromJson(Map<String, dynamic> json) {
     return Allergy(
       substance: json['substance'] as String,
@@ -20,7 +18,6 @@ class Allergy {
     );
   }
 
-  /// Convert to JSON
   Map<String, dynamic> toJson() {
     return {
       'substance': substance,

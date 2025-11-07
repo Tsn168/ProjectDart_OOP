@@ -73,7 +73,8 @@ class MedicationRepository {
         final jsonString = file.readAsStringSync();
         final List<dynamic> jsonList = json.decode(jsonString);
         _medications.clear();
-        _medications.addAll(jsonList.map((j) => Medication.fromJson(j)).toList());
+        _medications
+            .addAll(jsonList.map((j) => Medication.fromJson(j)).toList());
       } else {
         _initializeDefaultData();
       }
@@ -82,19 +83,18 @@ class MedicationRepository {
     }
   }
 
-  /// Save medications to JSON file
   void _saveToFile() {
     try {
       final file = File(_dataFile);
       file.createSync(recursive: true);
-      final jsonString = json.encode(_medications.map((m) => m.toJson()).toList());
+      final jsonString =
+          json.encode(_medications.map((m) => m.toJson()).toList());
       file.writeAsStringSync(jsonString);
     } catch (e) {
       print('Error saving medications: $e');
     }
   }
 
-  /// Initialize with default sample data
   void _initializeDefaultData() {
     _medications.clear();
     _medications.add(Medication(

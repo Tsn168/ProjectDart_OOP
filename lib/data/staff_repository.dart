@@ -3,7 +3,6 @@ import 'dart:convert';
 import '../domain/entities/medical_staff.dart';
 import '../domain/enums/staff_role.dart';
 
-/// Repository for managing medical staff
 class StaffRepository {
   final List<MedicalStaff> _staff = [];
   final String _dataFile = 'data/staff.json';
@@ -12,12 +11,10 @@ class StaffRepository {
     _loadFromFile();
   }
 
-  /// Get all staff members
   List<MedicalStaff> getAllStaff() {
     return List.unmodifiable(_staff);
   }
 
-  /// Get staff by ID
   MedicalStaff? getStaffById(String id) {
     try {
       return _staff.firstWhere((s) => s.id == id);
@@ -26,17 +23,14 @@ class StaffRepository {
     }
   }
 
-  /// Get all doctors
   List<MedicalStaff> getDoctors() {
     return _staff.where((s) => s.role == StaffRole.doctor).toList();
   }
 
-  /// Get all nurses
   List<MedicalStaff> getNurses() {
     return _staff.where((s) => s.role == StaffRole.nurse).toList();
   }
 
-  /// Load staff from JSON file
   void _loadFromFile() {
     try {
       final file = File(_dataFile);
@@ -53,7 +47,6 @@ class StaffRepository {
     }
   }
 
-  /// Save staff to JSON file
   void _saveToFile() {
     try {
       final file = File(_dataFile);
@@ -65,7 +58,6 @@ class StaffRepository {
     }
   }
 
-  /// Initialize with default staff data
   void _initializeDefaultData() {
     _staff.clear();
     _staff.add(MedicalStaff(

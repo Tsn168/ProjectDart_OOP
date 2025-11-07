@@ -1,6 +1,5 @@
 import '../enums/staff_role.dart';
 
-/// Entity representing medical staff (Doctor or Nurse)
 class MedicalStaff {
   final String id;
   final String name;
