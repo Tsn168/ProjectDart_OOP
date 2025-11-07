@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 import 'package:medication_manager/domain/entities/medication.dart';
 import 'package:medication_manager/domain/enums/enums.dart';
-import 'package:medication_manager/data/medication_repository.dart';
+import 'package:medication_manager/data/repositories.dart';
 
 void main() {
   group('Medication Tests', () {

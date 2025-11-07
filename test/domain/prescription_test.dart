@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 import 'package:medication_manager/domain/entities/prescription.dart';
-import 'package:medication_manager/data/prescription_repository.dart';
+import 'package:medication_manager/data/repositories.dart';
 
 void main() {
   group('Prescription Tests', () {

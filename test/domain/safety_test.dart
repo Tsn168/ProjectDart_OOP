@@ -3,7 +3,7 @@ import 'package:medication_manager/domain/entities/patient.dart';
 import 'package:medication_manager/domain/entities/medication.dart';
 import 'package:medication_manager/domain/entities/allergy.dart';
 import 'package:medication_manager/domain/enums/enums.dart';
-import 'package:medication_manager/data/safety_service.dart';
+import 'package:medication_manager/data/repositories.dart';
 
 void main() {
   group('Safety Service Tests', () {

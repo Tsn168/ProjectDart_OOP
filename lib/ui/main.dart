@@ -1,9 +1,5 @@
 import 'dart:io';
-import '../data/patient_repository.dart';
-import '../data/medication_repository.dart';
-import '../data/prescription_repository.dart';
-import '../data/staff_repository.dart';
-import '../data/safety_service.dart';
+import '../data/repositories.dart';
 import '../domain/entities/medical_staff.dart';
 import '../domain/enums/enums.dart';
 
@@ -181,8 +177,9 @@ class MedicationManagerApp {
     // Check for allergy conflicts
     if (SafetyService.hasAllergyConflict(patient, medication)) {
       final allergyDetails =
-          SafetyService.getAllergyDetails(patient, medication);
-      print('\n🛑 SAFETY ALERT: Patient allergic to $allergyDetails!');
+          SafetyService.getAllergyConflictSeverity(patient, medication);
+      print('\n🛑 SAFETY ALERT: Patient has allergy conflict!');
+      SafetyService.displayAllergyWarning(allergyDetails!, medication.name);
       final confirm = _getInput('Create prescription anyway? (y/n): ');
       if (confirm.toLowerCase() != 'y') {
         print('❌ Prescription cancelled.\n');
