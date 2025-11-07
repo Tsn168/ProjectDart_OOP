@@ -1,1 +1,0 @@
-[{"id":"RX001","patientId":"P001","doctorId":"D001","medicationId":"M001","dosage":"1 tablet","isActive":true},{"id":"RX002","patientId":"P002","doctorId":"D001","medicationId":"M002","dosage":"2 tablets","isActive":false},{"id":"RX003","patientId":"P003","doctorId":"D002","medicationId":"M003","dosage":"1 spoon","isActive":true}]
