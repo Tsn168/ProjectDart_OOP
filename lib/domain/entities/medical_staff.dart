@@ -1,20 +1,27 @@
 import '../enums/enums.dart';
 import 'entity.dart';
 
-/// Base class for medical staff - Demonstrates: Inheritance
 abstract class BaseMedicalStaff extends Entity {
-  final String id;
-  final String name;
-  final StaffRole role;
+  final String _id;
+  final String _name;
+  final StaffRole _role;
 
   BaseMedicalStaff({
-    required this.id,
-    required this.name,
-    required this.role,
-  });
+    required String id,
+    required String name,
+    required StaffRole role,
+  })  : _id = id,
+        _name = name,
+        _role = role;
 
-  /// Abstract method - Polymorphism
+  String get id => _id;
+  String get name => _name;
+  StaffRole get role => _role;
+
   String getPermission();
+
+  @override
+  String toString() => '[$_id] $_name (${_role.name})';
 }
 
 class Doctor extends BaseMedicalStaff {
@@ -30,7 +37,6 @@ class Doctor extends BaseMedicalStaff {
   @override
   String getPermission() => 'Can create prescriptions and view patient records';
 
-  /// Factory constructor - Polymorphism
   factory Doctor.fromJson(Map<String, dynamic> json) {
     return Doctor(
       id: json['id'] as String,
@@ -42,17 +48,16 @@ class Doctor extends BaseMedicalStaff {
   @override
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'name': name,
-      'role': role.name,
+      'id': _id,
+      'name': _name,
+      'role': _role.name,
     };
   }
 
   @override
-  String toString() => '[$id] Dr. $name (${role.name})';
+  String toString() => '[$_id] Dr. $_name (${_role.name})';
 }
 
-/// Concrete implementation of Nurse - Demonstrates: Inheritance
 class Nurse extends BaseMedicalStaff {
   Nurse({
     required String id,
@@ -66,7 +71,6 @@ class Nurse extends BaseMedicalStaff {
   @override
   String getPermission() => 'Can administer medications and view prescriptions';
 
-  /// Factory constructor - Polymorphism
   factory Nurse.fromJson(Map<String, dynamic> json) {
     return Nurse(
       id: json['id'] as String,
@@ -78,36 +82,34 @@ class Nurse extends BaseMedicalStaff {
   @override
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'name': name,
-      'role': role.name,
+      'id': _id,
+      'name': _name,
+      'role': _role.name,
     };
   }
 
   @override
-  String toString() => '[$id] $name (${role.name})';
+  String toString() => '[$_id] $_name (${_role.name})';
 }
 
-/// Legacy class for backward compatibility
 class MedicalStaff extends BaseMedicalStaff {
   MedicalStaff({
     required String id,
     required String name,
     required StaffRole role,
   }) : super(
-    id: id,
-    name: name,
-    role: role,
-  );
+          id: id,
+          name: name,
+          role: role,
+        );
 
   @override
   String getPermission() {
-    return role == StaffRole.doctor
-        ? 'Can create prescriptions'
-        : 'Can administer medications';
+    return _role == StaffRole.doctor
+        ? 'Can create prescriptions and view patient records'
+        : 'Can administer medications and view prescriptions';
   }
 
-  /// Factory constructor - Polymorphism
   factory MedicalStaff.fromJson(Map<String, dynamic> json) {
     return MedicalStaff(
       id: json['id'] as String,
@@ -118,18 +120,15 @@ class MedicalStaff extends BaseMedicalStaff {
     );
   }
 
-  /// Convert to JSON
   @override
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'name': name,
-      'role': role.name,
+      'id': _id,
+      'name': _name,
+      'role': _role.name,
     };
   }
 
   @override
-  String toString() {
-    return '[$id] $name (${role.name})';
-  }
+  String toString() => '[$_id] $_name (${_role.name})';
 }

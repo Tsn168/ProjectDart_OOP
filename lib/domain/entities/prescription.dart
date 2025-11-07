@@ -8,7 +8,7 @@ class Prescription extends Entity {
   final String doctorId;
   final String medicationId;
   final String dosage;
-  
+
   /// Private state with getter - Encapsulation
   bool _isActive;
 
@@ -21,14 +21,12 @@ class Prescription extends Entity {
     bool isActive = true,
   }) : _isActive = isActive;
 
-  /// Getter for active status - Encapsulation
   bool get isActive => _isActive;
-  
-  /// Method to deactivate - Business logic encapsulated
+
   void deactivate() {
     _isActive = false;
   }
-  
+
   /// Check if prescription is valid
   bool isValid() => _isActive;
 

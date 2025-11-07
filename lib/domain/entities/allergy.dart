@@ -2,16 +2,22 @@ import '../enums/enums.dart';
 import 'entity.dart';
 
 class Allergy extends Entity {
-  final String substance;
-  final AllergySeverity severity;
+  final String _substance;
+  final AllergySeverity _severity;
 
   Allergy({
-    required this.substance,
-    required this.severity,
-  });
+    required String substance,
+    required AllergySeverity severity,
+  })  : _substance = substance,
+        _severity = severity;
+  String get substance => _substance;
+  AllergySeverity get severity => _severity;
+  bool get isHighSeverity => _severity == AllergySeverity.high;
+  bool get isMediumSeverity => _severity == AllergySeverity.medium;
+  bool get isLowSeverity => _severity == AllergySeverity.low;
 
   @override
-  String get id => substance;
+  String get id => _substance;
 
   factory Allergy.fromJson(Map<String, dynamic> json) {
     return Allergy(
@@ -25,8 +31,11 @@ class Allergy extends Entity {
   @override
   Map<String, dynamic> toJson() {
     return {
-      'substance': substance,
-      'severity': severity.name,
+      'substance': _substance,
+      'severity': _severity.name,
     };
   }
+
+  @override
+  String toString() => '$_substance (${_severity.name})';
 }

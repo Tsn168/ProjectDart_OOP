@@ -2,21 +2,22 @@ import 'allergy.dart';
 import 'entity.dart';
 
 class Patient extends Entity {
-  final String id;
-  final String name;
+  final String _id;
+  final String _name;
 
   final List<Allergy> _allergies;
 
   Patient({
-    required this.id,
-    required this.name,
+    required String id,
+    required String name,
     required List<Allergy> allergies,
-  }) : _allergies = List.unmodifiable(allergies); // Immutable list
-
+  })  : _id = id,
+        _name = name,
+        _allergies = List.unmodifiable(allergies);
+  String get id => _id;
+  String get name => _name;
   List<Allergy> get allergies => _allergies;
-
   bool hasAllergies() => _allergies.isNotEmpty;
-
   String getAllergyInfo() {
     if (_allergies.isEmpty) return 'No allergies';
     return _allergies
@@ -33,8 +34,6 @@ class Patient extends Entity {
           .toList(),
     );
   }
-
-  /// Convert to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,

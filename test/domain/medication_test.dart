@@ -8,13 +8,11 @@ void main() {
     test('Medication ID should auto-increment M001, M002, M003', () {
       var repo = MedicationRepository(testMode: true);
       var medications = repo.getAllMedications();
-      
-      // Check default medications have correct IDs
       expect(medications[0].id, 'M001');
       expect(medications[1].id, 'M002');
       expect(medications[2].id, 'M003');
       expect(medications[3].id, 'M004');
-      
+
       // Create new medication and check auto-increment
       var newMed = repo.createMedication(
         'Test Medicine',
@@ -35,11 +33,11 @@ void main() {
       );
 
       expect(medication.stockQuantity, 100);
-      
+
       // Simulate administering medication
       medication.stockQuantity -= 1;
       expect(medication.stockQuantity, 99);
-      
+
       medication.stockQuantity -= 1;
       expect(medication.stockQuantity, 98);
     });
@@ -74,7 +72,6 @@ void main() {
         stockQuantity: 75,
       );
 
-      // Convert to JSON and back
       var json = medication.toJson();
       var restored = Medication.fromJson(json);
 
@@ -88,13 +85,13 @@ void main() {
     test('Repository should update stock correctly', () {
       var repo = MedicationRepository(testMode: true);
       var medication = repo.getMedicationById('M001');
-      
+
       expect(medication, isNotNull);
       var initialStock = medication!.stockQuantity;
-      
+
       // Update stock
       repo.updateStock('M001', initialStock - 5);
-      
+
       var updatedMed = repo.getMedicationById('M001');
       expect(updatedMed!.stockQuantity, initialStock - 5);
     });
