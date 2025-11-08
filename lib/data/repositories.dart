@@ -22,11 +22,15 @@ abstract class BaseJsonRepository<T extends Entity> {
         final jsonString = file.readAsStringSync();
         final List<dynamic> jsonList = json.decode(jsonString);
         items.clear();
-        items.addAll(jsonList.map((j) => fromJson(j as Map<String, dynamic>)).toList());
+        items.addAll(
+            jsonList.map((j) => fromJson(j as Map<String, dynamic>)).toList());
+        print('✅ Loaded ${items.length} items from $dataFile');
       } else {
+        print('📁 File not found: $dataFile. Creating default data...');
         initializeDefaultData();
       }
     } catch (e) {
+      print('❌ Error loading $dataFile: $e');
       initializeDefaultData();
     }
   }
@@ -35,10 +39,12 @@ abstract class BaseJsonRepository<T extends Entity> {
     try {
       final file = File(dataFile);
       file.createSync(recursive: true);
-      final jsonString = json.encode(items.map((item) => item.toJson()).toList());
+      final jsonString =
+          json.encode(items.map((item) => item.toJson()).toList());
       file.writeAsStringSync(jsonString);
+      print('✅ Saved ${items.length} items to $dataFile');
     } catch (e) {
-      print('Error saving to $dataFile: $e');
+      print('❌ Error saving to $dataFile: $e');
     }
   }
 
@@ -80,7 +86,7 @@ abstract class BaseJsonRepository<T extends Entity> {
 // ============================================================
 class PatientRepository extends BaseJsonRepository<Patient> {
   PatientRepository({bool testMode = false}) {
-    dataFile = 'data/patients.json';
+    dataFile = 'lib/data/storage/patients.json'; // ✅ FIXED PATH
     if (!testMode) {
       loadFromFile();
     } else {
@@ -114,7 +120,9 @@ class PatientRepository extends BaseJsonRepository<Patient> {
     items.add(Patient(
       id: 'P001',
       name: 'John Doe',
-      allergies: [Allergy(substance: 'Penicillin', severity: AllergySeverity.high)],
+      allergies: [
+        Allergy(substance: 'Penicillin', severity: AllergySeverity.high)
+      ],
     ));
     items.add(Patient(
       id: 'P002',
@@ -124,7 +132,9 @@ class PatientRepository extends BaseJsonRepository<Patient> {
     items.add(Patient(
       id: 'P003',
       name: 'Bob Wilson',
-      allergies: [Allergy(substance: 'Aspirin', severity: AllergySeverity.medium)],
+      allergies: [
+        Allergy(substance: 'Aspirin', severity: AllergySeverity.medium)
+      ],
     ));
     saveToFile();
   }
@@ -135,7 +145,7 @@ class PatientRepository extends BaseJsonRepository<Patient> {
 // ============================================================
 class MedicationRepository extends BaseJsonRepository<Medication> {
   MedicationRepository({bool testMode = false}) {
-    dataFile = 'data/medications.json';
+    dataFile = 'lib/data/storage/medications.json'; // ✅ FIXED PATH
     if (!testMode) {
       loadFromFile();
     } else {
@@ -218,7 +228,7 @@ class MedicationRepository extends BaseJsonRepository<Medication> {
 // ============================================================
 class PrescriptionRepository extends BaseJsonRepository<Prescription> {
   PrescriptionRepository({bool testMode = false}) {
-    dataFile = 'data/prescriptions.json';
+    dataFile = 'lib/data/storage/prescriptions.json'; // ✅ FIXED PATH
     if (!testMode) {
       loadFromFile();
     }
@@ -247,7 +257,8 @@ class PrescriptionRepository extends BaseJsonRepository<Prescription> {
   }
 
   List<Prescription> getAllPrescriptions() => getAll();
-  List<Prescription> getActivePrescriptions() => items.where((p) => p.isActive).toList();
+  List<Prescription> getActivePrescriptions() =>
+      items.where((p) => p.isActive).toList();
   Prescription? getPrescriptionById(String id) => getById(id);
 
   void deactivatePrescription(String prescriptionId) {
@@ -259,7 +270,8 @@ class PrescriptionRepository extends BaseJsonRepository<Prescription> {
   }
 
   @override
-  Prescription fromJson(Map<String, dynamic> json) => Prescription.fromJson(json);
+  Prescription fromJson(Map<String, dynamic> json) =>
+      Prescription.fromJson(json);
 
   @override
   void initializeDefaultData() {
@@ -273,7 +285,7 @@ class PrescriptionRepository extends BaseJsonRepository<Prescription> {
 // ============================================================
 class StaffRepository extends BaseJsonRepository<MedicalStaff> {
   StaffRepository({bool testMode = false}) {
-    dataFile = 'data/staff.json';
+    dataFile = 'lib/data/storage/staff.json'; // ✅ FIXED PATH
     if (!testMode) {
       loadFromFile();
     } else {
@@ -283,11 +295,14 @@ class StaffRepository extends BaseJsonRepository<MedicalStaff> {
 
   List<MedicalStaff> getAllStaff() => getAll();
   MedicalStaff? getStaffById(String id) => getById(id);
-  List<MedicalStaff> getDoctors() => items.where((s) => s.role == StaffRole.doctor).toList();
-  List<MedicalStaff> getNurses() => items.where((s) => s.role == StaffRole.nurse).toList();
+  List<MedicalStaff> getDoctors() =>
+      items.where((s) => s.role == StaffRole.doctor).toList();
+  List<MedicalStaff> getNurses() =>
+      items.where((s) => s.role == StaffRole.nurse).toList();
 
   @override
-  MedicalStaff fromJson(Map<String, dynamic> json) => MedicalStaff.fromJson(json);
+  MedicalStaff fromJson(Map<String, dynamic> json) =>
+      MedicalStaff.fromJson(json);
 
   @override
   void initializeDefaultData() {
@@ -341,13 +356,15 @@ class SafetyService {
     return null;
   }
 
-  static bool _isRelatedSubstance(String medicationName, String allergySubstance) {
+  static bool _isRelatedSubstance(
+      String medicationName, String allergySubstance) {
     final m = medicationName.toLowerCase();
     final a = allergySubstance.toLowerCase();
     return m.contains(a) || a.contains(m);
   }
 
-  static void displayAllergyWarning(AllergySeverity severity, String substance) {
+  static void displayAllergyWarning(
+      AllergySeverity severity, String substance) {
     switch (severity) {
       case AllergySeverity.high:
         print('🛑 CRITICAL ALLERGY WARNING!');
